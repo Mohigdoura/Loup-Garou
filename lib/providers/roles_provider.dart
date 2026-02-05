@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/shop/shop_provider.dart';
 import 'package:loup_garou/models/game_character.dart';
+import 'package:loup_garou/models/game_characters.dart';
 
 /// Role selection state using role names as identifiers
 class RoleSelection {
@@ -16,11 +17,8 @@ class RoleSelection {
 
   bool get isComplete => currentTotal == targetTotal;
 
-  bool canIncrement(GameCharacter role) {
-    final count = selectedCounts[role.name] ?? 0;
-
+  bool canIncrement() {
     if (currentTotal >= targetTotal) return false;
-    if (role.isUnique && count >= 1) return false;
 
     return true;
   }
@@ -29,8 +27,6 @@ class RoleSelection {
     final count = selectedCounts[role.name] ?? 0;
 
     if (count <= 0) return false;
-    if (role.isMandatory && role.isUnique) return false;
-    if (role.isMandatory && count <= 1) return false;
 
     return true;
   }
@@ -51,16 +47,6 @@ class RoleSelectionNotifier extends Notifier<RoleSelection> {
   @override
   RoleSelection build() {
     final initialCounts = <String, int>{};
-    final allRoles = ref.read(rolesProvider.notifier).getAllAvailableRoles();
-
-    for (final role in allRoles) {
-      if (role.isMandatory && role.isUnique) {
-        initialCounts[role.name] = 1;
-      } else if (role.isMandatory) {
-        initialCounts[role.name] = 1;
-      }
-    }
-
     return RoleSelection(selectedCounts: initialCounts, targetTotal: 0);
   }
 
@@ -69,7 +55,7 @@ class RoleSelectionNotifier extends Notifier<RoleSelection> {
   }
 
   void increment(GameCharacter role) {
-    if (!state.canIncrement(role)) return;
+    if (!state.canIncrement()) return;
 
     final current = state.selectedCounts[role.name] ?? 0;
     final newCounts = Map<String, int>.from(state.selectedCounts);
@@ -84,7 +70,7 @@ class RoleSelectionNotifier extends Notifier<RoleSelection> {
     final current = state.selectedCounts[role.name] ?? 0;
     final newCounts = Map<String, int>.from(state.selectedCounts);
 
-    if (current - 1 == 0 && !role.isMandatory) {
+    if (current - 1 == 0) {
       newCounts.remove(role.name);
     } else {
       newCounts[role.name] = current - 1;
@@ -95,15 +81,6 @@ class RoleSelectionNotifier extends Notifier<RoleSelection> {
 
   void reset() {
     final initialCounts = <String, int>{};
-    final allRoles = ref.read(rolesProvider.notifier).getAllAvailableRoles();
-
-    for (final role in allRoles) {
-      if (role.isMandatory && role.isUnique) {
-        initialCounts[role.name] = 1;
-      } else if (role.isMandatory) {
-        initialCounts[role.name] = 1;
-      }
-    }
 
     state = RoleSelection(
       selectedCounts: initialCounts,
@@ -119,15 +96,10 @@ final roleSelectionProvider =
 
 /// Configuration for a paid role
 class PaidRoleConfig {
-  final String roleName;
+  final GameCharacter role;
   final int price;
-  final GameCharacter Function() createInstance;
 
-  const PaidRoleConfig({
-    required this.roleName,
-    required this.price,
-    required this.createInstance,
-  });
+  const PaidRoleConfig({required this.role, required this.price});
 }
 
 class RolesNotifier extends Notifier<List<GameCharacter>> {
@@ -136,80 +108,62 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
     return [];
   }
 
-  // Base free roles - using factory functions for fresh instances
+  // Singleton instances - one per role type
+  static final _ancient = Ancient();
+  static final _seer = Seer();
+  static final _protector = Protector();
+  static final _villager = Villager();
+  static final _simpleWolf = SimpleWolf();
+  static final _whiteWolf = WhiteWolf();
+  static final _blackWolf = BlackWolf();
+  static final _witch = Witch();
+  static final _hunter = Hunter();
+  static final _cursedChild = CursedChild();
+  static final _clown = Clown();
+  static final _serialKiller = SerialKiller();
+  static final _avenger = Avenger();
+
   List<GameCharacter> get _freeRoles => [
-    Ancient(),
-    Seer(),
-    Protector(),
-    Villager(),
-    SimpleWolf(),
-    WhiteWolf(),
-    BlackWolf(),
+    _ancient,
+    _seer,
+    _protector,
+    _villager,
+    _simpleWolf,
+    _whiteWolf,
+    _blackWolf,
   ];
 
-  // Paid roles configuration with prices
-  final List<PaidRoleConfig> _paidRolesConfig = const [
-    PaidRoleConfig(roleName: 'Witch', price: 100, createInstance: Witch.new),
-    PaidRoleConfig(roleName: 'Hunter', price: 150, createInstance: Hunter.new),
+  final List<PaidRoleConfig> _paidRolesConfig = [
+    PaidRoleConfig(role: _witch, price: 1),
+    PaidRoleConfig(role: _hunter, price: 1),
+    PaidRoleConfig(role: _cursedChild, price: 1),
+    PaidRoleConfig(role: _clown, price: 1),
+    PaidRoleConfig(role: _serialKiller, price: 1),
+    PaidRoleConfig(role: _avenger, price: 1),
   ];
 
-  /// Get map of paid role names to their prices
-  Map<String, int> getPaidRolePrices() {
-    return {
-      for (final config in _paidRolesConfig) config.roleName: config.price,
-    };
-  }
-
-  /// Get all paid role configurations
-  List<PaidRoleConfig> getPaidRoleConfigs() => _paidRolesConfig;
-
-  /// Create a fresh role instance by name
+  // Much simpler!
   GameCharacter? createRoleByName(String name) {
-    // Check free roles
-    for (final role in _freeRoles) {
-      if (role.name == name) {
-        // Return the role's type constructor
-        return role.runtimeType.toString() == 'Ancient'
-            ? Ancient()
-            : role.runtimeType.toString() == 'Seer'
-            ? Seer()
-            : role.runtimeType.toString() == 'Protector'
-            ? Protector()
-            : role.runtimeType.toString() == 'Villager'
-            ? Villager()
-            : role.runtimeType.toString() == 'SimpleWolf'
-            ? SimpleWolf()
-            : role.runtimeType.toString() == 'WhiteWolf'
-            ? WhiteWolf()
-            : role.runtimeType.toString() == 'BlackWolf'
-            ? BlackWolf()
-            : null;
-      }
-    }
-
-    // Check paid roles
-    for (final config in _paidRolesConfig) {
-      if (config.roleName == name) {
-        return config.createInstance();
-      }
-    }
-
-    return null;
-  }
-
-  /// Get a template role instance by name (for display purposes)
-  GameCharacter? getRoleTemplateByName(String name) {
-    // Check free roles
-    final freeRole = _freeRoles.where((role) => role.name == name).firstOrNull;
+    // Try free roles first
+    final freeRole = _freeRoles.where((r) => r.name == name).firstOrNull;
     if (freeRole != null) return freeRole;
 
-    // Check paid roles
-    final paidConfig = _paidRolesConfig
-        .where((config) => config.roleName == name)
-        .firstOrNull;
-    if (paidConfig != null) return paidConfig.createInstance();
+    // Try paid roles
+    return _paidRolesConfig.where((c) => c.role.name == name).firstOrNull?.role;
+  }
 
-    return null;
+  // No more factory functions needed!
+  void buildFromSelection(Map<String, int> selectedCounts) {
+    clear();
+
+    selectedCounts.forEach((roleName, count) {
+      final role = createRoleByName(roleName);
+      if (role != null) {
+        for (int i = 0; i < count; i++) {
+          addRole(role); // Same instance, no problem!
+        }
+      }
+    });
   }
 
   /// Get all available roles (free + purchased paid roles)
@@ -218,8 +172,8 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
     final availableRoles = [..._freeRoles];
 
     for (final config in _paidRolesConfig) {
-      if (purchasedNames.contains(config.roleName)) {
-        availableRoles.add(config.createInstance());
+      if (purchasedNames.contains(config.role.name)) {
+        availableRoles.add(config.role);
       }
     }
 
@@ -230,7 +184,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
   List<PaidRoleConfig> getUnpurchasedRoles() {
     final purchasedNames = ref.read(shopProvider);
     return _paidRolesConfig
-        .where((config) => !purchasedNames.contains(config.roleName))
+        .where((config) => !purchasedNames.contains(config.role.name))
         .toList();
   }
 
@@ -238,8 +192,8 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
   List<GameCharacter> getPurchasedRoles() {
     final purchasedNames = ref.read(shopProvider);
     return _paidRolesConfig
-        .where((config) => purchasedNames.contains(config.roleName))
-        .map((config) => config.createInstance())
+        .where((config) => purchasedNames.contains(config.role.name))
+        .map((config) => config.role)
         .toList();
   }
 
@@ -253,21 +207,6 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
 
   void clear() {
     state = [];
-  }
-
-  /// Build roles from selection map (uses role names as keys)
-  void buildFromSelection(Map<String, int> selectedCounts) {
-    clear();
-
-    selectedCounts.forEach((roleName, count) {
-      for (int i = 0; i < count; i++) {
-        // Create fresh instance for each role
-        final role = createRoleByName(roleName);
-        if (role != null) {
-          addRole(role);
-        }
-      }
-    });
   }
 }
 

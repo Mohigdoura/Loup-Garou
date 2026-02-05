@@ -9,17 +9,17 @@ class CoinsProvider extends Notifier<int> {
     return coins;
   }
 
-  void addCoins(int amount) {
+  Future<void> addCoins(int amount) async {
     final prefs = ref.read(sharedPrefsProvider);
     final newCoins = state + amount;
-    prefs.setInt('coins', newCoins);
+    await prefs.setInt('coins', newCoins);
     state = newCoins;
   }
 
-  void decrementCoins(int amount) {
+  Future<void> decrementCoins(int amount) async {
     final prefs = ref.read(sharedPrefsProvider);
     final newCoins = state - amount;
-    prefs.setInt('coins', newCoins);
+    await prefs.setInt('coins', newCoins);
     state = newCoins;
   }
 }

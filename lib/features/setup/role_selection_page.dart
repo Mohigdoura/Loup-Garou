@@ -47,7 +47,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
         .read(rolesProvider.notifier)
         .buildFromSelection(selection.selectedCounts);
     ref.read(gameStateProvider.notifier).resetGame();
-
+    ref.read(rolesProvider).shuffle();
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const PickerPage()),
@@ -226,7 +226,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                       role: role,
                       count: selection.getCount(role),
                       isSelected: selection.isSelected(role),
-                      canIncrement: selection.canIncrement(role),
+                      canIncrement: selection.canIncrement(),
                       canDecrement: selection.canDecrement(role),
                       teamColor: _getTeamColor(role.team),
                       onIncrement: () => _increment(role),
@@ -406,10 +406,6 @@ class _RoleCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      if (role.isUnique) ...[
-                        _buildBadge('UNIQUE', Colors.orange.shade700),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -426,103 +422,7 @@ class _RoleCard extends StatelessWidget {
 
             const SizedBox(width: 12),
 
-            // Counter
-            if (role.isUnique && role.isMandatory)
-              _buildLockedCounter()
-            else if (role.isUnique)
-              _buildToggleCounter()
-            else
-              _buildIncrementCounter(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 9,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLockedCounter() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFd4af37).withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: const Color(0xFFd4af37).withValues(alpha: 0.5),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.lock, size: 16, color: const Color(0xFFd4af37)),
-          const SizedBox(width: 6),
-          const Text(
-            '1',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFd4af37),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleCounter() {
-    return GestureDetector(
-      onTap: isSelected ? onDecrement : (canIncrement ? onIncrement : null),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFFd4af37).withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFFd4af37).withValues(alpha: 0.5)
-                : Colors.white.withValues(alpha: 0.2),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? Icons.check_circle : Icons.add_circle_outline,
-              size: 18,
-              color: isSelected
-                  ? const Color(0xFFd4af37)
-                  : Colors.white.withValues(alpha: 0.5),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              isSelected ? '1' : '0',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isSelected
-                    ? const Color(0xFFd4af37)
-                    : Colors.white.withValues(alpha: 0.5),
-              ),
-            ),
+            _buildIncrementCounter(),
           ],
         ),
       ),

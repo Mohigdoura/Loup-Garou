@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/models/game_state.dart';
+import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/game_state_provider.dart';
+import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
 import 'package:loup_garou/models/game_character.dart';
-import 'package:loup_garou/providers/ad_provider.dart';
 
 class DayPage extends ConsumerStatefulWidget {
   const DayPage({super.key});
@@ -202,7 +202,7 @@ class _DayPageState extends ConsumerState<DayPage>
     final eliminated = await _pickPlayer(candidates);
 
     if (eliminated != null && mounted) {
-      gameStateNotifier.killPlayer(eliminated.name);
+      await gameStateNotifier.votePlayer(eliminated);
 
       // Reveal result
       final result = eliminated.gameCharacter.team == Team.wolves
@@ -254,7 +254,7 @@ class _DayPageState extends ConsumerState<DayPage>
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '$eliminated $result',
+                  '${eliminated.name} $result',
                   style: TextStyle(
                     fontSize: 18,
                     color: eliminated.gameCharacter.team == Team.wolves
@@ -286,48 +286,14 @@ class _DayPageState extends ConsumerState<DayPage>
 
       // Check win condition
       if (gameStateNotifier.checkWinCondition() && mounted) {
-        await showGameOverDialog();
+        await GameOverDialog.show(context, ref);
         return;
       }
     }
 
     // Go to next night (whether someone was eliminated or not)
     if (!mounted) return;
-    gameStateNotifier.nextDay();
-  }
-
-  Future<void> showGameOverDialog() async {
-    final gameState = ref.read(gameStateProvider);
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1a1f3a),
-        title: const Text(
-          'Game Over',
-          style: TextStyle(color: Color(0xFFd4af37)),
-        ),
-        content: Text(
-          gameState.gameOverMessage ?? 'Game ended.',
-          style: const TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(adProvider.notifier)
-                  .showInterstitial(
-                    () => Navigator.popUntil(context, (route) => route.isFirst),
-                  );
-            },
-            child: const Text(
-              'BACK TO MENU',
-              style: TextStyle(color: Color(0xFFd4af37)),
-            ),
-          ),
-        ],
-      ),
-    );
+    gameStateNotifier.nextNight();
   }
 
   @override

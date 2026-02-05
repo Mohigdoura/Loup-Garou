@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -34,7 +35,7 @@ class AdNotifier extends Notifier<AdState> {
           state = state.copyWith(isInterstitialLoaded: false);
 
           // Optional: Add logging or retry logic
-          print('Interstitial ad failed to load: ${err.message}');
+          log('Interstitial ad failed to load: ${err.message}');
         },
       ),
     );
@@ -55,7 +56,7 @@ class AdNotifier extends Notifier<AdState> {
           state = state.copyWith(isRewardedLoaded: false);
 
           // Optional: Add logging or retry logic
-          print('Rewarded ad failed to load: ${err.message}');
+          log('Rewarded ad failed to load: ${err.message}');
         },
       ),
     );

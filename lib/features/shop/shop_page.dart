@@ -23,14 +23,15 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch shop provider to rebuild when purchases change
+    ref.watch(shopProvider);
+
     // Get purchased roles (as GameCharacter instances)
-    final purchasedRoles = ref
-        .watch(rolesProvider.notifier)
-        .getPurchasedRoles();
+    final purchasedRoles = ref.read(rolesProvider.notifier).getPurchasedRoles();
 
     // Get unpurchased roles (as PaidRoleConfig with price info)
     final unpurchasedConfigs = ref
-        .watch(rolesProvider.notifier)
+        .read(rolesProvider.notifier)
         .getUnpurchasedRoles();
 
     return Scaffold(
@@ -92,12 +93,8 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final config = unpurchasedConfigs[index];
-                  final role = config.createInstance();
-                  return _ShopRoleCard(
-                    role: role,
-                    price: config.price,
-                    roleName: config.roleName,
-                  );
+                  final role = config.role;
+                  return _ShopRoleCard(role: role, price: config.price);
                 },
               ),
               const SizedBox(height: 16),
@@ -173,13 +170,8 @@ class _RoleCard extends ConsumerWidget {
 class _ShopRoleCard extends ConsumerWidget {
   final GameCharacter role;
   final int price;
-  final String roleName;
 
-  const _ShopRoleCard({
-    required this.role,
-    required this.price,
-    required this.roleName,
-  });
+  const _ShopRoleCard({required this.role, required this.price});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -282,7 +274,7 @@ class _ShopRoleCard extends ConsumerWidget {
                 // Purchase role using role name
                 await ref
                     .read(shopProvider.notifier)
-                    .purchaseRole(roleName, price);
+                    .purchaseRole(role.name, price);
 
                 if (context.mounted) {
                   Navigator.pop(context);

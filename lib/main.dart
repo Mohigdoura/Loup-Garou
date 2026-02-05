@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:loup_garou/features/Landing/custom_paywall_screen.dart';
 import 'package:loup_garou/features/welcome/main_menu.dart';
 import 'package:loup_garou/providers/shared_prefs_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   final prefs = await SharedPreferences.getInstance();
+  log("prefs is done");
 
   try {
     MobileAds.instance.initialize();
@@ -71,7 +73,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.light,
-      home: MainMenu(),
+      home: CustomPaywallScreen(),
     );
   }
 }

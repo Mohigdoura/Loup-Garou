@@ -3,14 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/shop/coins_provider.dart';
 import 'package:loup_garou/providers/shared_prefs_provider.dart';
 
-/// Manages purchased roles using role names as unique identifiers
-/// Uses Set for O(1) lookups and automatic deduplication
 class ShopNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
     final prefs = ref.read(sharedPrefsProvider);
     final purchased = prefs.getStringList('purchased_roles') ?? [];
-    log("Loaded purchased roles: $purchased");
     return purchased.toSet();
   }
 
@@ -31,7 +28,7 @@ class ShopNotifier extends Notifier<Set<String>> {
       return;
     }
     // Deduct coins
-    ref.read(coinsProvider.notifier).decrementCoins(price);
+    await ref.read(coinsProvider.notifier).decrementCoins(price);
 
     final prefs = ref.read(sharedPrefsProvider);
     final newPurchased = {...state, roleName};
@@ -39,7 +36,9 @@ class ShopNotifier extends Notifier<Set<String>> {
     // Save to persistent storage
     await prefs.setStringList('purchased_roles', newPurchased.toList());
 
+    // Update state to notify listeners
     state = newPurchased;
+
     log("Purchased role: $roleName. Total: ${state.length}");
   }
 
