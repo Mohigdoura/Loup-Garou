@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loup_garou/features/Game/game.dart';
-import 'package:loup_garou/main.dart';
+import 'package:go_router/go_router.dart';
 
 class GiveToNarratorPage extends StatefulWidget {
   const GiveToNarratorPage({super.key});
@@ -208,11 +207,7 @@ class _GiveToNarratorPageState extends State<GiveToNarratorPage>
                       // Start button
                       _StartGameButton(
                         onPressed: () {
-                          navigatorKey.currentState?.pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) => const Game(),
-                            ),
-                          );
+                          context.pushReplacement("/game");
                         },
                       ),
 

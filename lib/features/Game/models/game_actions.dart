@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/features/Game/game_state_provider.dart';
+import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
 import 'package:loup_garou/models/night_action_result.dart';

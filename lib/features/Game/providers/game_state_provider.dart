@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
-import 'package:loup_garou/features/Game/game_actions.dart';
+import 'package:loup_garou/features/Game/models/game_actions.dart';
 import 'package:loup_garou/models/game_characters.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/models/night_action_result.dart';
-import 'package:loup_garou/providers/names_provider.dart';
-import 'package:loup_garou/providers/roles_provider.dart';
+import 'package:loup_garou/features/setup/providers/names_provider.dart';
+import 'package:loup_garou/features/setup/providers/roles_provider.dart';
 import 'package:loup_garou/models/game_character.dart';
 
 class GameStateNotifier extends Notifier<GameState> {
@@ -166,11 +166,12 @@ class GameStateNotifier extends Notifier<GameState> {
   }
 
   void nextDay() {
-    _clearEffects();
     state = state.copyWith(isNight: !state.isNight);
   }
 
   void nextNight() {
+    ref.invalidate(nightContextProvider);
+    _clearEffects();
     state = state.copyWith(
       isNight: !state.isNight,
       nightCount: state.nightCount + 1,
@@ -267,16 +268,11 @@ class GameStateNotifier extends Notifier<GameState> {
         .where((p) => p.gameCharacter.team == Team.wolves)
         .toList();
 
-    if (wolves.isEmpty) {
-      // No wolves in game - this shouldn't happen in normal gameplay
-      return false;
-    }
-
     final deadWolves = wolves.where((p) => p.isDead).length;
     final totalWolves = wolves.length;
 
     // Village wins if all wolves are dead
-    if (deadWolves == totalWolves) {
+    if (deadWolves == totalWolves && wolves.isNotEmpty) {
       state = state.copyWith(
         winCondition: WinCondition(
           message: 'Village wins! All wolves are dead.',
@@ -304,13 +300,12 @@ class GameStateNotifier extends Notifier<GameState> {
 
     // Check for Serial Killer win
     final alivePlayers = getAlivePlayers();
-    if (alivePlayers.length == 1 &&
-        alivePlayers.first.gameCharacter is SerialKiller) {
+    if (alivePlayers.length == 1) {
       state = state.copyWith(
         winCondition: WinCondition(
           message:
-              '${alivePlayers.first.name} (Serial Killer) wins! They are the last player alive.',
-          winningTeam: Team.solo,
+              '${alivePlayers.first.name} (${alivePlayers.first.gameCharacter.name}) wins! They are the last player alive.',
+          winningTeam: alivePlayers.first.gameCharacter.team,
           winners: [alivePlayers.first],
         ),
       );

@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loup_garou/models/ad_state.dart';
@@ -19,6 +20,7 @@ class AdNotifier extends Notifier<AdState> {
 
   void loadInterstitial() {
     // Don't load if already loading or loaded
+    if (kDebugMode) return;
     if (state.isInterstitialLoaded || state.interstitialAd != null) return;
 
     InterstitialAd.load(

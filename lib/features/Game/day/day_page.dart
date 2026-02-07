@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
-import 'package:loup_garou/features/Game/game_state_provider.dart';
+import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
 import 'package:loup_garou/models/game_character.dart';
 
@@ -86,7 +87,7 @@ class _DayPageState extends ConsumerState<DayPage>
                     if (index == candidates.length) {
                       // Skip option
                       return InkWell(
-                        onTap: () => Navigator.pop(context, null),
+                        onTap: () => context.pop(null),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -125,7 +126,7 @@ class _DayPageState extends ConsumerState<DayPage>
 
                     final player = candidates[index];
                     return InkWell(
-                      onTap: () => Navigator.pop(context, player),
+                      onTap: () => context.pop(player),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -265,7 +266,7 @@ class _DayPageState extends ConsumerState<DayPage>
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => context.pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         eliminated.gameCharacter.team == Team.wolves
@@ -598,7 +599,7 @@ class _DayPageState extends ConsumerState<DayPage>
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
-                    onPressed: () => gameStateNotifier.nextDay(),
+                    onPressed: () => gameStateNotifier.nextNight(),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.white, width: 2),
                       padding: const EdgeInsets.symmetric(vertical: 16),

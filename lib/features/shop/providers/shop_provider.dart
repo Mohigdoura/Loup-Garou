@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/features/shop/coins_provider.dart';
+import 'package:loup_garou/features/shop/providers/coins_provider.dart';
 import 'package:loup_garou/providers/shared_prefs_provider.dart';
 
 class ShopNotifier extends Notifier<Set<String>> {

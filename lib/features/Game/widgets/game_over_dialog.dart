@@ -1,7 +1,7 @@
 // lib/features/Game/widgets/game_over_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/features/Game/game_state_provider.dart';
+import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
 
 class GameOverDialog {

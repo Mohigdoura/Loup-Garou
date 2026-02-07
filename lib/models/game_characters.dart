@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
 import 'package:loup_garou/main.dart';
-import 'package:loup_garou/features/Game/game_actions.dart';
+import 'package:loup_garou/features/Game/models/game_actions.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 
@@ -199,7 +199,7 @@ Future<void> _wakePhase(
             ),
             const SizedBox(height: 12),
             Text(
-              'Please wake the $name and perform their action.',
+              'Please wake $name and perform their action.',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.white.withValues(alpha: 0.8),
@@ -812,7 +812,7 @@ class SimpleWolf extends GameCharacter {
   }) async {
     await _wakePhase(
       "Wolves",
-      "Wolves",
+      "The Wolves",
       self.gameCharacter.icon,
       _getColorForCharacter(SimpleWolf()),
     );
@@ -843,7 +843,7 @@ class WhiteWolf extends SimpleWolf {
   @override
   String? get image => 'assets/wolf.png';
   @override
-  Color? get imageColor => Colors.grey;
+  Color? get imageColor => Colors.white;
   @override
   Team get team => Team.wolves;
   @override

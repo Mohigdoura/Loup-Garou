@@ -41,6 +41,7 @@ dependencies:
   font_awesome_flutter: ^10.9.1
   purchases_flutter: ^9.11.0
   purchases_ui_flutter: ^9.11.0
+  go_router: ^17.0.0
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +63,7 @@ flutter_launcher_icons:
   # Adaptive Icon Setup
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "assets/wolf_nobg.png"
-  adaptive_icon_foreground_inset: 40 # Start at 0 since your png has 20% padding
+  adaptive_icon_foreground_inset: 20 # Start at 0 since your png has 20% padding
   # to change the icon run :  dart run flutter_launcher_icons
 
   # The "flutter_lints" package below contains a set of recommended lints to

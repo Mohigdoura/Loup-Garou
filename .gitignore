@@ -17,7 +17,12 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-
+# Local environment variables file
+.env
+# all the json files that are used to store sensitive data
+*.json
+# Keystore files
+*.jks
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.

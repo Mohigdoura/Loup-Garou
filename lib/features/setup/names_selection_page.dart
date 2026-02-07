@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/providers/names_provider.dart';
-import 'package:loup_garou/features/setup/role_selection_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:loup_garou/features/setup/providers/names_provider.dart';
 
-class PlayersSelectionPage extends ConsumerStatefulWidget {
-  const PlayersSelectionPage({super.key});
+class NamesSelectionPage extends ConsumerStatefulWidget {
+  const NamesSelectionPage({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _PlayersSelectionPageState();
+      _NamesSelectionPageState();
 }
 
-class _PlayersSelectionPageState extends ConsumerState<PlayersSelectionPage>
+class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
     with TickerProviderStateMixin {
   final TextEditingController _nameController = TextEditingController();
   late AnimationController _listAnimationController;
@@ -41,6 +41,7 @@ class _PlayersSelectionPageState extends ConsumerState<PlayersSelectionPage>
 
       // Check for duplicates
       if (names.contains(name)) {
+        _nameController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Player name already exists!'),
@@ -87,7 +88,7 @@ class _PlayersSelectionPageState extends ConsumerState<PlayersSelectionPage>
                         Icons.arrow_back,
                         color: Color(0xFFd4af37),
                       ),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => context.pop(),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -137,6 +138,7 @@ class _PlayersSelectionPageState extends ConsumerState<PlayersSelectionPage>
                     children: [
                       Expanded(
                         child: TextField(
+                          autofocus: names.length < 5,
                           focusNode: _nameFocusNode,
                           controller: _nameController,
                           style: const TextStyle(
@@ -280,12 +282,8 @@ class _PlayersSelectionPageState extends ConsumerState<PlayersSelectionPage>
                     isEnabled: names.length >= 5,
                     playerCount: names.length,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RoleSelectionPage(),
-                        ),
-                      );
+                      _nameFocusNode.unfocus();
+                      context.push("/role-selection");
                     },
                   ),
                 ),

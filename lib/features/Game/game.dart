@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/day/day_page.dart';
 import 'package:loup_garou/features/Game/night/night_page.dart';
-import 'package:loup_garou/main.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
-import 'package:loup_garou/features/Game/game_state_provider.dart';
+import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 
 class Game extends ConsumerWidget {
   const Game({super.key});
@@ -33,7 +33,7 @@ class Game extends ConsumerWidget {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
+                  onPressed: () => dialogContext.pop(),
                   child: const Text(
                     'Cancel',
                     style: TextStyle(color: Colors.white),
@@ -41,9 +41,9 @@ class Game extends ConsumerWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(dialogContext); // Close the dialog
+                    dialogContext.pop(); // Close the dialog
                     ref.read(adProvider.notifier).showInterstitial(() {
-                      navigatorKey.currentState?.pop(); // Exit the game screen
+                      context.pop(); // Exit the game screen
                     });
                   },
                   child: const Text(

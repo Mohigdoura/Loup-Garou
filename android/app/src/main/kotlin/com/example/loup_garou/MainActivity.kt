@@ -1,5 +1,8 @@
-package com.example.loup_garou
+package com.mohi.loup_garou
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+class MainActivity: FlutterFragmentActivity() {
+    // Just change FlutterActivity to FlutterFragmentActivity
+    // That's it!
+}

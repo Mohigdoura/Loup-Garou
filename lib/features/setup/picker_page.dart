@@ -2,9 +2,9 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/features/setup/give_to_narrator_page.dart';
-import 'package:loup_garou/providers/names_provider.dart';
-import 'package:loup_garou/providers/roles_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:loup_garou/features/setup/providers/names_provider.dart';
+import 'package:loup_garou/features/setup/providers/roles_provider.dart';
 import 'package:loup_garou/models/game_character.dart';
 
 class PickerPage extends ConsumerStatefulWidget {
@@ -197,13 +197,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                               },
                             );
                           } else {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const GiveToNarratorPage(),
-                              ),
-                            );
+                            context.push("/give-narrator");
                           }
                         },
                       )
@@ -215,12 +209,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                     if (kDebugMode)
                       TextButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const GiveToNarratorPage(),
-                            ),
-                          );
+                          context.push("/give-narrator");
                         },
                         child: Text(
                           "Skip to game",

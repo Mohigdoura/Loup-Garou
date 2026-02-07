@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/providers/shared_prefs_provider.dart';
 
@@ -6,7 +7,7 @@ class CoinsProvider extends Notifier<int> {
   int build() {
     final prefs = ref.read(sharedPrefsProvider);
     final coins = prefs.getInt('coins') ?? 0;
-    return coins;
+    return kDebugMode ? 100000 : coins;
   }
 
   Future<void> addCoins(int amount) async {

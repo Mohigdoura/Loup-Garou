@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/features/setup/players_selection_page.dart';
-import 'package:loup_garou/features/shop/shop_page.dart';
+import 'package:go_router/go_router.dart';
 
 class MainMenu extends ConsumerStatefulWidget {
   const MainMenu({super.key});
@@ -116,7 +115,6 @@ class _MainMenuState extends ConsumerState<MainMenu>
                     Container(
                       width: 120,
                       height: 120,
-                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
@@ -184,16 +182,10 @@ class _MainMenuState extends ConsumerState<MainMenu>
                         children: [
                           Expanded(
                             child: _MenuButton(
-                              label: 'NEW GAME',
+                              label: 'New Game',
                               icon: Icons.play_arrow_rounded,
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PlayersSelectionPage(),
-                                  ),
-                                );
+                                context.push('/name-selection');
                               },
                             ),
                           ),
@@ -203,12 +195,7 @@ class _MainMenuState extends ConsumerState<MainMenu>
                               label: 'Shop',
                               icon: Icons.shopping_cart_outlined,
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ShopPage(),
-                                  ),
-                                );
+                                context.push('/shop');
                               },
                             ),
                           ),
@@ -283,7 +270,7 @@ class _MainMenuState extends ConsumerState<MainMenu>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text(
               'GOT IT',
               style: TextStyle(color: Color(0xFFd4af37)),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loup_garou/features/Game/game_actions.dart';
+import 'package:loup_garou/features/Game/models/game_actions.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 
 enum Team { village, wolves, solo }

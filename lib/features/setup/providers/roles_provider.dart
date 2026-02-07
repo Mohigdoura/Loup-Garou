@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loup_garou/features/shop/shop_provider.dart';
+import 'package:loup_garou/features/shop/providers/shop_provider.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/models/game_characters.dart';
 
@@ -130,16 +130,16 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
     _villager,
     _simpleWolf,
     _whiteWolf,
-    _blackWolf,
   ];
 
   final List<PaidRoleConfig> _paidRolesConfig = [
-    PaidRoleConfig(role: _witch, price: 1),
-    PaidRoleConfig(role: _hunter, price: 1),
-    PaidRoleConfig(role: _cursedChild, price: 1),
-    PaidRoleConfig(role: _clown, price: 1),
-    PaidRoleConfig(role: _serialKiller, price: 1),
-    PaidRoleConfig(role: _avenger, price: 1),
+    PaidRoleConfig(role: _witch, price: 150),
+    PaidRoleConfig(role: _blackWolf, price: 100),
+    PaidRoleConfig(role: _hunter, price: 200),
+    PaidRoleConfig(role: _cursedChild, price: 350),
+    PaidRoleConfig(role: _clown, price: 500),
+    PaidRoleConfig(role: _serialKiller, price: 750),
+    PaidRoleConfig(role: _avenger, price: 350),
   ];
 
   // Much simpler!

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
-import 'package:loup_garou/features/Game/game_state_provider.dart';
+import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/models/night_action_result.dart';
@@ -182,7 +183,7 @@ class _NightPageState extends ConsumerState<NightPage>
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFd4af37),
                   padding: const EdgeInsets.symmetric(
