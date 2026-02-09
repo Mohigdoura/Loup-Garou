@@ -1,9 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
 import 'package:loup_garou/features/Game/models/game_actions.dart';
 import 'package:loup_garou/models/game_characters.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
-import 'package:loup_garou/models/night_action_result.dart';
+import 'package:loup_garou/features/Game/providers/night_action_result.dart';
 import 'package:loup_garou/features/setup/providers/names_provider.dart';
 import 'package:loup_garou/features/setup/providers/roles_provider.dart';
 import 'package:loup_garou/models/game_character.dart';
@@ -76,6 +78,19 @@ class GameStateNotifier extends Notifier<GameState> {
     await player.gameCharacter.onVotedOut(
       actions: GameActions.fromNotifier(ref, this, state),
       self: player,
+    );
+  }
+
+  void littlePrinceOnVotedOut(GamePlayer player) {
+    state = state.copyWith(
+      players: _sortPlayers(
+        state.players.map((p) {
+          if (p.name == player.name) {
+            return p.copyWith(lives: 1);
+          }
+          return p;
+        }).toList(),
+      ),
     );
   }
 
@@ -188,7 +203,11 @@ class GameStateNotifier extends Notifier<GameState> {
     final rolesInOrder =
         alivePlayers.map((p) => p.gameCharacter).toSet().toList()
           ..sort((a, b) => b.priority.compareTo(a.priority));
-
+    final isAncientAlive = rolesInOrder
+        .where((element) => element.name == 'Ancient')
+        .isNotEmpty;
+    log("rolesInOrder: $rolesInOrder");
+    log("Anvient is alive: $isAncientAlive");
     // Execute each role's night action in priority order
     for (final role in rolesInOrder) {
       final playersWithRole = alivePlayers.where(
@@ -204,6 +223,7 @@ class GameStateNotifier extends Notifier<GameState> {
           );
           wolvesActed = true;
         }
+        if (role.team == Team.village && !isAncientAlive) continue;
         await role.nightAction(
           actions: GameActions.fromNotifier(ref, this, state),
           self: player,
@@ -267,12 +287,16 @@ class GameStateNotifier extends Notifier<GameState> {
     final wolves = state.players
         .where((p) => p.gameCharacter.team == Team.wolves)
         .toList();
+    final villagers = state.players
+        .where((p) => p.gameCharacter.team == Team.village)
+        .toList();
 
-    final deadWolves = wolves.where((p) => p.isDead).length;
-    final totalWolves = wolves.length;
+    final aliveVillagers = villagers.where((p) => p.isAlive).length;
+
+    final aliveWolves = wolves.where((p) => p.isAlive).length;
 
     // Village wins if all wolves are dead
-    if (deadWolves == totalWolves && wolves.isNotEmpty) {
+    if (aliveWolves == 0 && wolves.isNotEmpty && aliveVillagers > 0) {
       state = state.copyWith(
         winCondition: WinCondition(
           message: 'Village wins! All wolves are dead.',
@@ -282,13 +306,8 @@ class GameStateNotifier extends Notifier<GameState> {
       return true;
     }
 
-    final aliveWolves = wolves.where((p) => p.isAlive).length;
-    final aliveVillagers = state.players
-        .where((p) => p.isAlive && p.gameCharacter.team != Team.wolves)
-        .length;
-
     // Wolves win if they kill all villagers
-    if (aliveVillagers == 0 && aliveWolves > 0) {
+    if (aliveVillagers == 0 && aliveWolves > 0 && villagers.isNotEmpty) {
       state = state.copyWith(
         winCondition: WinCondition(
           message: 'Wolves win! They killed all the villagers.',

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +7,7 @@ import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
 import 'package:loup_garou/models/game_character.dart';
-import 'package:loup_garou/models/night_action_result.dart';
+import 'package:loup_garou/features/Game/providers/night_action_result.dart';
 
 class NightPage extends ConsumerStatefulWidget {
   const NightPage({super.key});
@@ -104,7 +106,7 @@ class _NightPageState extends ConsumerState<NightPage>
   /// Show night results by comparing before/after state
   Future<void> _showNightResults() async {
     final nightResults = ref.read(nightContextProvider).nightResult.entries;
-
+    log("night results: $nightResults");
     await showDialog(
       context: context,
       builder: (_) => Dialog(

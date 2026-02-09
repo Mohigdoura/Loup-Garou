@@ -9,43 +9,7 @@ class MainMenu extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _MainMenuState();
 }
 
-class _MainMenuState extends ConsumerState<MainMenu>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-      ),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
-      ),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+class _MainMenuState extends ConsumerState<MainMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,158 +32,129 @@ class _MainMenuState extends ConsumerState<MainMenu>
               return Positioned(
                 left: (index * 37) % MediaQuery.of(context).size.width,
                 top: (index * 53) % MediaQuery.of(context).size.height,
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: (0.2 + (index % 3) * 0.2) * _fadeAnimation.value,
-                      child: Container(
-                        width: 2 + (index % 3).toDouble(),
-                        height: 2 + (index % 3).toDouble(),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              blurRadius: 4,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
+                child: Container(
+                  width: 2 + (index % 3).toDouble(),
+                  height: 2 + (index % 3).toDouble(),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        blurRadius: 4,
+                        spreadRadius: 1,
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
               );
             }),
             // Main content
             SafeArea(
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: Transform.scale(
-                      scale: _scaleAnimation.value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(flex: 2),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(flex: 2),
 
-                    // Moon icon
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            const Color(0xFFf5e6d3),
-                            const Color(0xFFd4af37).withValues(alpha: 0.8),
-                          ],
+                  // Moon icon
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFf5e6d3),
+                          const Color(0xFFd4af37).withValues(alpha: 0.8),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFd4af37).withValues(alpha: 0.4),
+                          blurRadius: 40,
+                          spreadRadius: 10,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFFd4af37,
-                            ).withValues(alpha: 0.4),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: Image.asset('assets/wolf_nobg.png'),
+                      ],
                     ),
+                    child: Image.asset('assets/wolf_nobg.png'),
+                  ),
 
-                    const SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
-                    // Title
-                    Text(
-                      'LOUP GAROU',
-                      style: TextStyle(
-                        fontSize: 56,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 4,
-                        foreground: Paint()
-                          ..shader = const LinearGradient(
-                            colors: [Color(0xFFf5e6d3), Color(0xFFd4af37)],
-                          ).createShader(const Rect.fromLTWH(0, 0, 400, 70)),
-                        shadows: [
-                          Shadow(
-                            color: const Color(
-                              0xFFd4af37,
-                            ).withValues(alpha: 0.5),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
+                  // Title
+                  Text(
+                    'LOUP GAROU',
+                    style: TextStyle(
+                      fontSize: 56,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 4,
+                      foreground: Paint()
+                        ..shader = const LinearGradient(
+                          colors: [Color(0xFFf5e6d3), Color(0xFFd4af37)],
+                        ).createShader(const Rect.fromLTWH(0, 0, 400, 70)),
+                      shadows: [
+                        Shadow(
+                          color: const Color(0xFFd4af37).withValues(alpha: 0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
+                  ),
 
-                    const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-                    Text(
-                      'The Werewolf Game',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 3,
-                        color: Colors.white.withValues(alpha: 0.6),
-                      ),
+                  Text(
+                    'The Werewolf Game',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w300,
+                      letterSpacing: 3,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
+                  ),
 
-                    const Spacer(flex: 1),
+                  const Spacer(flex: 1),
 
-                    // Start button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _MenuButton(
-                              label: 'New Game',
-                              icon: Icons.play_arrow_rounded,
-                              onPressed: () {
-                                context.push('/name-selection');
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _MenuButton(
-                              label: 'Shop',
-                              icon: Icons.shopping_cart_outlined,
-                              onPressed: () {
-                                context.push('/shop');
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: _MenuButton(
+                      label: 'New Game',
+                      icon: Icons.play_arrow_rounded,
+                      onPressed: () {
+                        context.push('/name-selection');
+                      },
                     ),
+                  ),
+                  const SizedBox(height: 16),
 
-                    const SizedBox(height: 16),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: _MenuButton(
-                        label: 'RULES',
-                        icon: Icons.menu_book_rounded,
-                        isSecondary: true,
-                        onPressed: () {
-                          _showRulesDialog(context);
-                        },
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: _MenuButton(
+                      label: 'Shop',
+                      icon: Icons.shopping_cart_outlined,
+                      onPressed: () {
+                        context.push('/shop');
+                      },
                     ),
+                  ),
 
-                    const Spacer(flex: 2),
-                  ],
-                ),
+                  const SizedBox(height: 16),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: _MenuButton(
+                      label: 'RULES',
+                      icon: Icons.menu_book_rounded,
+                      isSecondary: true,
+                      onPressed: () {
+                        _showRulesDialog(context);
+                      },
+                    ),
+                  ),
+
+                  const Spacer(flex: 1),
+                ],
               ),
             ),
           ],
@@ -250,7 +185,7 @@ class _MainMenuState extends ConsumerState<MainMenu>
           child: Text(
             '🌙 OBJECTIVE\n'
             'Village team: Eliminate all werewolves\n'
-            'Werewolf team: Outnumber the villagers\n\n'
+            'Werewolf team: Kill all villagers\n\n'
             '🌓 GAME FLOW\n'
             '1. Night Phase: Special roles act\n'
             '2. Day Phase: Discuss and vote\n'
@@ -261,7 +196,10 @@ class _MainMenuState extends ConsumerState<MainMenu>
             'Protector: Guards one player\n'
             'Witch: One heal, one poison\n'
             'Hunter: Kills a wolf when eliminated\n'
-            'Ancient: 2 lives, sets talking order',
+            'Ancient: 2 lives, sets talking order\n'
+            '............................................\n'
+            'And a lot more roles you unlock in the shop!\n\n',
+
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.9),
               height: 1.6,

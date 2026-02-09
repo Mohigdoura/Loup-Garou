@@ -14,22 +14,22 @@ class NamesSelectionPage extends ConsumerStatefulWidget {
 class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
     with TickerProviderStateMixin {
   final TextEditingController _nameController = TextEditingController();
-  late AnimationController _listAnimationController;
   final FocusNode _nameFocusNode = FocusNode();
+  bool _isReady = false; // Add this
+
   @override
   void initState() {
     super.initState();
-    _listAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    // Delay heavy rendering until after route animation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _isReady = true);
+    });
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _nameFocusNode.dispose();
-    _listAnimationController.dispose();
     super.dispose();
   }
 
@@ -58,14 +58,101 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
       // Call addName - no need for setState since Riverpod handles it
       ref.read(namesProvider.notifier).addName(name);
       _nameController.clear();
-      _listAnimationController.forward(from: 0);
     }
+  }
+
+  void _editPlayerName(BuildContext context, int index, String currentName) {
+    final TextEditingController editController = TextEditingController(
+      text: currentName,
+    );
+    final FocusNode editFocusNode = FocusNode();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1a1f3a),
+        title: const Text(
+          'Edit Name',
+          style: TextStyle(
+            color: Color(0xFFd4af37),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: TextField(
+          controller: editController,
+          focusNode: editFocusNode,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Enter player name',
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFd4af37)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFd4af37), width: 2),
+            ),
+          ),
+          onSubmitted: (_) {
+            Navigator.of(dialogContext).pop();
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newName = editController.text.trim();
+              if (newName.isNotEmpty && newName != currentName) {
+                final names = ref.read(namesProvider);
+                // Check for duplicates (excluding current name)
+                if (names.where((n) => n != currentName).contains(newName)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Player name already exists!'),
+                      backgroundColor: Colors.red.shade700,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                ref.read(namesProvider.notifier).updateName(index, newName);
+              }
+              Navigator.of(dialogContext).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFd4af37),
+              foregroundColor: const Color(0xFF0a0e27),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ).then((_) {
+      editController.dispose();
+      editFocusNode.dispose();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final names = ref.watch(namesProvider);
     final namesNotifier = ref.read(namesProvider.notifier);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -75,236 +162,267 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
             colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
+        child: _isReady
+            ? SafeArea(
+                child: Column(
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Color(0xFFd4af37),
-                      ),
-                      onPressed: () => context.pop(),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Add Players',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFd4af37),
-                          ),
-                        ),
-                        Text(
-                          '${names.length} ${names.length == 1 ? "player" : "players"} added',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Input section
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFd4af37).withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          autofocus: names.length < 5,
-                          focusNode: _nameFocusNode,
-                          controller: _nameController,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Enter player name',
-                            hintStyle: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.4),
-                            ),
-                            border: InputBorder.none,
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        children: [
+                          IconButton(
                             icon: const Icon(
-                              Icons.person_add,
+                              Icons.arrow_back,
                               color: Color(0xFFd4af37),
                             ),
+                            onPressed: () => context.pop(),
                           ),
-                          onSubmitted: (_) {
-                            _addPlayer();
-                            _nameFocusNode.requestFocus();
-                          },
-                        ),
-                      ),
-                      IconButton(
-                        icon: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFd4af37), Color(0xFFf5e6d3)],
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Color(0xFF0a0e27),
-                          ),
-                        ),
-                        onPressed: _addPlayer,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Minimum players notice
-              if (names.length < 5)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.orange.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info_outline,
-                          color: Colors.orange,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Minimum ${5 - names.length} more ${5 - names.length == 1 ? "player" : "players"} needed',
-                            style: const TextStyle(
-                              color: Colors.orange,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-              // Players list
-              Expanded(
-                child: names.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.group_add,
-                              size: 80,
-                              color: Colors.white.withValues(alpha: 0.2),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No players added yet',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.4),
-                                fontSize: 16,
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Add Players',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFd4af37),
+                                ),
                               ),
+                              Text(
+                                '${names.length} ${names.length == 1 ? "player" : "players"} added',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Input section
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(
+                              0xFFd4af37,
+                            ).withValues(alpha: 0.3),
+                            width: 1.5,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                autofocus: names.length < 5 && _isReady,
+                                focusNode: _nameFocusNode,
+                                controller: _nameController,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter player name',
+                                  hintStyle: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.4),
+                                  ),
+                                  border: InputBorder.none,
+                                  icon: const Icon(
+                                    Icons.person_add,
+                                    color: Color(0xFFd4af37),
+                                  ),
+                                ),
+                                onSubmitted: (_) {
+                                  _addPlayer();
+                                  _nameFocusNode.requestFocus();
+                                },
+                              ),
+                            ),
+                            IconButton(
+                              icon: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFd4af37),
+                                      Color(0xFFf5e6d3),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Color(0xFF0a0e27),
+                                ),
+                              ),
+                              onPressed: _addPlayer,
                             ),
                           ],
                         ),
-                      )
-                    : ListView.builder(
-                        key: ValueKey(names.length),
+                      ),
+                    ),
+
+                    // Minimum players notice
+                    if (names.length < 5)
+                      Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 8,
                         ),
-                        itemCount: names.length,
-                        itemBuilder: (context, index) {
-                          return _PlayerCard(
-                            name: names[index],
-                            index: index,
-                            onRemove: () async {
-                              await namesNotifier.removeAt(index);
-                            },
-                          );
-                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.orange.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.info_outline,
+                                color: Colors.orange,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Minimum ${5 - names.length} more ${5 - names.length == 1 ? "player" : "players"} needed',
+                                  style: const TextStyle(
+                                    color: Colors.orange,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-              ),
 
-              // Bottom button
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      const Color(0xFF0a0e27).withValues(alpha: 0.95),
-                    ],
-                  ),
+                    // Players list
+                    Expanded(
+                      child: names.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.group_add,
+                                    size: 80,
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No players added yet',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ReorderableListView.builder(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 8,
+                              ),
+                              itemCount: names.length,
+                              itemBuilder: (context, index) {
+                                return _PlayerCard(
+                                  key: ValueKey(names[index]),
+                                  name: names[index],
+                                  index: index,
+                                  onRemove: () async {
+                                    await namesNotifier.removeAt(index);
+                                  },
+                                  onTap: () => _editPlayerName(
+                                    context,
+                                    index,
+                                    names[index],
+                                  ),
+                                );
+                              },
+                              onReorder: (oldIndex, newIndex) async {
+                                if (oldIndex < newIndex) {
+                                  newIndex -= 1;
+                                }
+                                await namesNotifier.moveName(
+                                  oldIndex,
+                                  newIndex,
+                                );
+                              },
+                            ),
+                    ),
+
+                    // Bottom button
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            const Color(0xFF0a0e27).withValues(alpha: 0.95),
+                          ],
+                        ),
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        child: _ContinueButton(
+                          isEnabled: names.length >= 5,
+                          playerCount: names.length,
+                          onPressed: () {
+                            _nameFocusNode.unfocus();
+                            context.push("/role-selection");
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: SafeArea(
-                  top: false,
-                  child: _ContinueButton(
-                    isEnabled: names.length >= 5,
-                    playerCount: names.length,
-                    onPressed: () {
-                      _nameFocusNode.unfocus();
-                      context.push("/role-selection");
-                    },
-                  ),
+              )
+            : Center(
+                child: CircularProgressIndicator(
+                  color: const Color(0xFFd4af37),
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }
 }
 
 class _PlayerCard extends StatelessWidget {
+  final Key key;
   final String name;
   final int index;
   final VoidCallback onRemove;
+  final VoidCallback onTap;
 
   const _PlayerCard({
+    required this.key,
     required this.name,
     required this.index,
     required this.onRemove,
+    required this.onTap,
   });
 
   @override
@@ -324,20 +442,43 @@ class _PlayerCard extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-        title: Text(
-          name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: ReorderableDelayedDragStartListener(
+          index: index,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 8,
+            ),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFd4af37), Color(0xFFf5e6d3)],
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.drag_indicator,
+                color: const Color(0xFF0a0e27),
+                size: 20,
+              ),
+            ),
+            title: Text(
+              name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.close, color: Colors.red.shade400),
+              onPressed: () => onRemove(),
+            ),
           ),
-        ),
-        trailing: IconButton(
-          icon: Icon(Icons.close, color: Colors.red.shade400),
-          onPressed: () => onRemove(),
         ),
       ),
     );

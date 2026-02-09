@@ -9,6 +9,7 @@ import 'package:loup_garou/features/Game/game.dart';
 import 'package:loup_garou/features/Game/give_to_narrator_page.dart';
 import 'package:loup_garou/features/Game/night/night_page.dart';
 import 'package:loup_garou/features/landing/main_menu.dart';
+import 'package:loup_garou/features/setup/names_selection_page.dart';
 import 'package:loup_garou/features/setup/picker_page.dart'; // Ensure correct path
 import 'package:loup_garou/features/setup/role_selection_page.dart'; // Ensure correct path
 import 'package:loup_garou/features/shop/shop_page.dart';
@@ -29,7 +30,7 @@ CustomTransitionPage buildSlideTransition<T>({
           Tween(
             begin: const Offset(1.0, 0.0),
             end: Offset.zero,
-          ).chain(CurveTween(curve: Curves.easeIn)),
+          ).chain(CurveTween(curve: Curves.easeOut)),
         ),
         child: child,
       );
@@ -49,6 +50,13 @@ final _router = GoRouter(
       pageBuilder: (context, state) => buildSlideTransition(
         key: state.pageKey,
         child: const RoleSelectionPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/name-selection',
+      pageBuilder: (context, state) => buildSlideTransition(
+        key: state.pageKey,
+        child: const NamesSelectionPage(),
       ),
     ),
     GoRoute(

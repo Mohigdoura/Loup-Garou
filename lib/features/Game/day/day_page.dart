@@ -5,6 +5,7 @@ import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
 import 'package:loup_garou/models/game_character.dart';
+import 'package:loup_garou/models/game_characters.dart';
 
 class DayPage extends ConsumerStatefulWidget {
   const DayPage({super.key});
@@ -208,6 +209,8 @@ class _DayPageState extends ConsumerState<DayPage>
       // Reveal result
       final result = eliminated.gameCharacter.team == Team.wolves
           ? 'is a wolf'
+          : eliminated.gameCharacter is Hunter
+          ? ""
           : 'is not a wolf';
 
       await showDialog(

@@ -122,6 +122,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
   static final _clown = Clown();
   static final _serialKiller = SerialKiller();
   static final _avenger = Avenger();
+  static final _littlePrince = LittlePrince();
 
   List<GameCharacter> get _freeRoles => [
     _ancient,
@@ -140,6 +141,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
     PaidRoleConfig(role: _clown, price: 500),
     PaidRoleConfig(role: _serialKiller, price: 750),
     PaidRoleConfig(role: _avenger, price: 350),
+    PaidRoleConfig(role: _littlePrince, price: 750),
   ];
 
   // Much simpler!

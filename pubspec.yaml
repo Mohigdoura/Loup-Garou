@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.3+3
 
 environment:
   sdk: ^3.8.1
@@ -54,15 +54,9 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   image_path: "assets/wolf_bg.png"
 
-  # Correct Windows Map configuration
-  windows:
-    generate: true
-    image_path: "assets/wolf_nobg.png"
-    icon_size: 256 # Higher resolution for Windows desktop icons
-
   # Adaptive Icon Setup
   adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "assets/wolf_nobg.png"
+  adaptive_icon_foreground: "assets/loup_garou_app_icon.png"
   adaptive_icon_foreground_inset: 20 # Start at 0 since your png has 20% padding
   # to change the icon run :  dart run flutter_launcher_icons
 

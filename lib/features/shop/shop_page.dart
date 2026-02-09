@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +7,15 @@ import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
 import 'package:loup_garou/features/shop/providers/coins_provider.dart';
 import 'package:loup_garou/features/setup/providers/roles_provider.dart';
+
+// Cached decorations for better performance
+const _kBackgroundGradient = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
+  ),
+);
 
 class ShopPage extends ConsumerStatefulWidget {
   const ShopPage({super.key});
@@ -34,13 +41,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
-          ),
-        ),
+        decoration: _kBackgroundGradient,
         child: SafeArea(
           child: Column(
             children: [
@@ -60,6 +61,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                         ),
                         GridView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
+                          cacheExtent: 200,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
@@ -72,7 +74,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
                             final role = purchasedRoles[index];
-                            return OwnedRoleCard(role: role);
+                            return RepaintBoundary(
+                              child: OwnedRoleCard(role: role),
+                            );
                           },
                         ),
                         const SizedBox(height: 24),
@@ -92,7 +96,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                           itemBuilder: (context, index) {
                             final config = unpurchasedConfigs[index];
                             final role = config.role;
-                            return RoleCard(role: role, price: config.price);
+                            return RepaintBoundary(
+                              child: RoleCard(role: role, price: config.price),
+                            );
                           },
                         ),
                         const SizedBox(height: 24),
@@ -119,14 +125,14 @@ class _ShopPageState extends ConsumerState<ShopPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.black.withValues(alpha: 0.3), Colors.transparent],
+          colors: [Colors.black.withOpacity(0.3), Colors.transparent],
         ),
       ),
       child: Row(
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: Colors.white.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -152,7 +158,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                   'Unlock new roles',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Colors.white.withOpacity(0.6),
                   ),
                 ),
               ],
@@ -172,7 +178,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFd4af37).withValues(alpha: 0.2),
+              color: const Color(0xFFd4af37).withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: const Color(0xFFd4af37), size: 20),
@@ -200,7 +206,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFFd4af37).withValues(alpha: 0.1),
+              color: const Color(0xFFd4af37).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.stars, size: 64, color: Color(0xFFd4af37)),
@@ -219,7 +225,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             'You own every character in the game',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.6),
+              color: Colors.white.withOpacity(0.6),
             ),
           ),
         ],
@@ -238,107 +244,71 @@ class OwnedRoleCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.green.shade700.withValues(alpha: 0.3),
-            Colors.green.shade900.withValues(alpha: 0.5),
-          ],
-        ),
-        border: Border.all(
-          color: Colors.green.withValues(alpha: 0.5),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.green.withValues(alpha: 0.2),
-            blurRadius: 8,
-            spreadRadius: 1,
-          ),
-        ],
+        color: Colors.green.shade800.withOpacity(0.4),
+        border: Border.all(color: Colors.green.withOpacity(0.5), width: 2),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Role icon/image
-                Container(
-                  width: 72,
-                  height: 72,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: role.image != null && role.image!.isNotEmpty
-                      ? Image.asset(
-                          role.image!,
-                          color: role.imageColor ?? Colors.green,
-                          fit: BoxFit.contain,
-                        )
-                      : FaIcon(
-                          role.icon,
-                          size: 48,
-                          color: Colors.green.shade300,
-                        ),
-                ),
-                const SizedBox(height: 12),
-
-                // Role name
-                Text(
-                  role.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const Spacer(),
-
-                // Owned badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green.withValues(alpha: 0.4),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check, color: Colors.white, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OWNED',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Role icon/image
+            Container(
+              width: 72,
+              height: 72,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: role.image != null && role.image!.isNotEmpty
+                  ? Image.asset(
+                      role.image!,
+                      color: role.imageColor ?? Colors.green,
+                      fit: BoxFit.contain,
+                    )
+                  : FaIcon(role.icon, size: 48, color: Colors.green.shade300),
             ),
-          ),
+            const SizedBox(height: 12),
+
+            // Role name
+            Text(
+              role.name,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const Spacer(),
+
+            // Owned badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check, color: Colors.white, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'OWNED',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -360,40 +330,24 @@ class RoleCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withValues(alpha: 0.05),
-            Colors.black.withValues(alpha: 0.3),
-          ],
-        ),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        color: const Color(0xFF1a1f3a).withOpacity(0.6),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _showAbilityDialog(context),
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    _buildRoleIcon(),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildRoleInfo()),
-                    const SizedBox(width: 12),
-                    _buildBuyButton(context, ref, canAfford),
-                  ],
-                ),
-              ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showBuyDialog(context, ref, canAfford),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                _buildRoleIcon(),
+                const SizedBox(width: 16),
+                Expanded(child: _buildRoleInfo()),
+                const SizedBox(width: 12),
+                _buildBuyButton(canAfford),
+              ],
             ),
           ),
         ),
@@ -409,16 +363,9 @@ class RoleCard extends ConsumerWidget {
       height: 64,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.3),
-            blurRadius: 8,
-            spreadRadius: 1,
-          ),
-        ],
+        border: Border.all(color: color.withOpacity(0.4), width: 1.5),
       ),
       child: role.image != null && role.image!.isNotEmpty
           ? Image.asset(
@@ -446,241 +393,157 @@ class RoleCard extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           'Tap to view abilities',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withValues(alpha: 0.5),
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.5)),
         ),
       ],
     );
   }
 
-  void _showAbilityDialog(BuildContext context) {
+  void _showBuyDialog(BuildContext context, WidgetRef ref, bool canAfford) {
     final teamColor = Colors.blue.shade600;
 
     showDialog(
       context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: AlertDialog(
-          backgroundColor: const Color(0xFF1a1f3a).withValues(alpha: 0.95),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: teamColor.withValues(alpha: 0.5), width: 2),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: teamColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: role.image != null && role.image!.isNotEmpty
-                    ? Image.asset(
-                        role.image!,
-                        width: 24,
-                        height: 24,
-                        color: role.imageColor,
-                      )
-                    : FaIcon(role.icon, color: teamColor, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  role.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Ability',
-                style: TextStyle(
-                  color: Color(0xFFd4af37),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                role.ability,
-                style: const TextStyle(color: Colors.white70, height: 1.5),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFd4af37),
-              ),
-              child: const Text(
-                "Close",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1a1f3a),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: teamColor.withOpacity(0.5), width: 2),
         ),
-      ),
-    );
-  }
-
-  void _showBuyDialog(BuildContext context, WidgetRef ref) {
-    final teamColor = Colors.blue.shade600;
-
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: AlertDialog(
-          backgroundColor: const Color(0xFF1a1f3a).withValues(alpha: 0.95),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: teamColor.withValues(alpha: 0.5), width: 2),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: teamColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: role.image != null && role.image!.isNotEmpty
-                    ? Image.asset(
-                        role.image!,
-                        width: 24,
-                        height: 24,
-                        color: role.imageColor,
-                      )
-                    : FaIcon(role.icon, color: teamColor, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  role.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Ability',
-                style: TextStyle(
-                  color: Color(0xFFd4af37),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                role.ability,
-                style: const TextStyle(color: Colors.white70, height: 1.5),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                context.pop();
-
-                await ref
-                    .read(shopProvider.notifier)
-                    .purchaseRole(role.name, price);
-
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.check_circle, color: Colors.white),
-                          const SizedBox(width: 8),
-                          Text('${role.name} purchased!'),
-                        ],
-                      ),
-                      backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  );
-                }
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFd4af37),
-              ),
-              child: const Text(
-                "Buy",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBuyButton(BuildContext context, WidgetRef ref, bool canAfford) {
-    return GestureDetector(
-      onTap: canAfford
-          ? () {
-              _showBuyDialog(context, ref);
-            }
-          : null,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: canAfford
-              ? const LinearGradient(
-                  colors: [Color(0xFFd4af37), Color(0xFFf4d03f)],
-                )
-              : null,
-          color: canAfford ? null : Colors.grey.shade800,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: canAfford
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFFd4af37).withValues(alpha: 0.4),
-                    blurRadius: 8,
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        title: Row(
           children: [
-            Icon(
-              Icons.monetization_on,
-              color: canAfford ? Colors.black : Colors.grey,
-              size: 20,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: teamColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: role.image != null && role.image!.isNotEmpty
+                  ? Image.asset(
+                      role.image!,
+                      width: 24,
+                      height: 24,
+                      color: role.imageColor,
+                    )
+                  : FaIcon(role.icon, color: teamColor, size: 24),
             ),
-            const SizedBox(width: 6),
-            Text(
-              price.toString(),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: canAfford ? Colors.black : Colors.grey,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                role.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Ability',
+              style: TextStyle(
+                color: Color(0xFFd4af37),
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              role.ability,
+              style: const TextStyle(color: Colors.white70, height: 1.5),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFd4af37),
+            ),
+            child: const Text(
+              "Close",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          TextButton(
+            onPressed: canAfford
+                ? () async {
+                    context.pop();
+
+                    await ref
+                        .read(shopProvider.notifier)
+                        .purchaseRole(role.name, price);
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 8),
+                              Text('${role.name} purchased!'),
+                            ],
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                : null,
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFd4af37),
+            ),
+            child: const Text(
+              "Buy",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBuyButton(bool canAfford) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: canAfford
+            ? const LinearGradient(
+                colors: [Color(0xFFd4af37), Color(0xFFf4d03f)],
+              )
+            : null,
+        color: canAfford ? null : Colors.grey.shade800,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.monetization_on,
+            color: canAfford ? Colors.black : Colors.grey,
+            size: 20,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            price.toString(),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: canAfford ? Colors.black : Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -704,7 +567,7 @@ class _CoinsButton extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFd4af37).withValues(alpha: 0.4),
+              color: const Color(0xFFd4af37).withOpacity(0.4),
               blurRadius: 8,
               spreadRadius: 1,
             ),
@@ -733,174 +596,159 @@ class _CoinsButton extends ConsumerWidget {
   void _showCoinsDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: AlertDialog(
-          backgroundColor: const Color(0xFF1a1f3a).withValues(alpha: 0.95),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Color(0xFFd4af37), width: 2),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFd4af37).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.monetization_on,
-                  color: Color(0xFFd4af37),
-                ),
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1a1f3a),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFd4af37), width: 2),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFd4af37).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(width: 12),
-              const Text(
-                "Earn Free Coins",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: const Icon(
+                Icons.monetization_on,
+                color: Color(0xFFd4af37),
               ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.play_circle_filled,
-                      color: Color(0xFFd4af37),
-                      size: 32,
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Watch a short ad',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Earn 50 coins instantly',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(),
-              style: TextButton.styleFrom(foregroundColor: Colors.white70),
-              child: const Text("Cancel"),
             ),
-            ElevatedButton(
-              onPressed: () {
-                final adNotifier = ref.read(adProvider.notifier);
-
-                if (!adNotifier.isRewardedReady) {
-                  if (context.mounted) {
-                    context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Row(
-                          children: [
-                            Icon(Icons.info, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text('Ad not ready yet. Please try again.'),
-                          ],
-                        ),
-                        backgroundColor: Colors.orange,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    );
-                  }
-                  return;
-                }
-
-                adNotifier.showRewarded(
-                  onRewardEarned: (rewardAmount) {
-                    ref.read(coinsProvider.notifier).addCoins(rewardAmount);
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.celebration,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 8),
-                              Text('🎉 $rewardAmount coins added!'),
-                            ],
-                          ),
-                          backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
-                  onDismissed: () {
-                    if (context.mounted) {
-                      context.pop();
-                    }
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFd4af37),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            const SizedBox(width: 12),
+            const Text(
+              "Earn Free Coins",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.play_arrow, size: 20),
-                  SizedBox(width: 4),
-                  Text(
-                    "Watch Ad",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Icon(
+                    Icons.play_circle_filled,
+                    color: Color(0xFFd4af37),
+                    size: 32,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Watch a short ad',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Earn 50 coins instantly',
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            style: TextButton.styleFrom(foregroundColor: Colors.white70),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final adNotifier = ref.read(adProvider.notifier);
+
+              if (!adNotifier.isRewardedReady) {
+                if (context.mounted) {
+                  context.pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Row(
+                        children: [
+                          Icon(Icons.info, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Ad not ready yet. Please try again.'),
+                        ],
+                      ),
+                      backgroundColor: Colors.orange,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }
+                return;
+              }
+
+              adNotifier.showRewarded(
+                onRewardEarned: (rewardAmount) {
+                  ref.read(coinsProvider.notifier).addCoins(rewardAmount);
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.celebration, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text('🎉 $rewardAmount coins added!'),
+                          ],
+                        ),
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                onDismissed: () {
+                  if (context.mounted) {
+                    context.pop();
+                  }
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFd4af37),
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.play_arrow, size: 20),
+                SizedBox(width: 4),
+                Text("Watch Ad", style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

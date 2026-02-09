@@ -275,7 +275,7 @@ class Ancient extends GameCharacter {
 
   @override
   String get ability =>
-      "has two lives and can decide who starts the talking and in which order";
+      "has two lives and if killed no one on the villagers team can use his ability and can decide who starts the talking and in which order";
   @override
   int get lives => 2;
 
@@ -330,7 +330,7 @@ class Ancient extends GameCharacter {
         children: [
           SimpleDialogOption(
             child: const Text(
-              'Clockwise',
+              'Clockwise (default)',
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () =>
@@ -338,7 +338,7 @@ class Ancient extends GameCharacter {
           ),
           SimpleDialogOption(
             child: const Text(
-              'Counter-clockwise',
+              'Counter-clockwise (reverse)',
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () =>
@@ -474,7 +474,8 @@ class Protector extends GameCharacter {
   Team get team => Team.village;
 
   @override
-  String get ability => 'Protect one player from being killed each night.';
+  String get ability =>
+      'Protect one player from being killed by wolves each night.';
   @override
   IconData get icon => FontAwesomeIcons.shield;
   @override
@@ -783,6 +784,25 @@ class Avenger extends GameCharacter {
     final nextPlayer = (thisPlayerIndex + 1) % (lastPlayer + 1);
     final nextAlivePlayer = state.players[nextPlayer];
     await actions.killPlayer(nextAlivePlayer, self);
+  }
+}
+
+class LittlePrince extends GameCharacter {
+  @override
+  String get name => "Little Prince";
+  @override
+  Team get team => Team.village;
+  @override
+  IconData get icon => FontAwesomeIcons.crown;
+  @override
+  String get ability => 'If voted out, reveals his role and stays in the game.';
+
+  @override
+  Future<void> onVotedOut({
+    required GameActions actions,
+    required GamePlayer self,
+  }) async {
+    actions.littlePrinceOnVotedOut(self);
   }
 }
 

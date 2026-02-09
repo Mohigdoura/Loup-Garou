@@ -50,6 +50,17 @@ class NamesNotifier extends Notifier<List<String>> {
     state = newState;
     await _prefs.setStringList('player_names', newState);
   }
+
+  Future<void> moveName(int from, int to) async {
+    final _prefs = ref.watch(sharedPrefsProvider);
+
+    final currentState = state;
+    final newState = List<String>.from(currentState);
+    final item = newState.removeAt(from);
+    newState.insert(to, item);
+    state = newState;
+    await _prefs.setStringList('player_names', newState);
+  }
 }
 
 final namesProvider = NotifierProvider<NamesNotifier, List<String>>(() {

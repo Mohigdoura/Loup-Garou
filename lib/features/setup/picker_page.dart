@@ -197,7 +197,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                               },
                             );
                           } else {
-                            context.push("/give-narrator");
+                            context.pushReplacement("/give-narrator");
                           }
                         },
                       )
@@ -209,7 +209,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                     if (kDebugMode)
                       TextButton(
                         onPressed: () {
-                          context.push("/give-narrator");
+                          context.pushReplacement("/give-narrator");
                         },
                         child: Text(
                           "Skip to game",
@@ -275,7 +275,7 @@ class _NextButtonState extends State<_NextButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                widget.isLastPlayer ? 'START GAME' : 'NEXT PLAYER',
+                widget.isLastPlayer ? 'DONE' : 'NEXT PLAYER',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

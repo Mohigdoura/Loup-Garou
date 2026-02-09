@@ -55,11 +55,7 @@ class NightContextNotifier extends Notifier<NightContext> {
   }
 
   void addNightResult(GamePlayer player, Result result) {
-    if (!state.nightResult.keys.contains(player)) {
-      state = state.copyWith(
-        nightResult: {...state.nightResult, player: result},
-      );
-    }
+    state = state.copyWith(nightResult: {...state.nightResult, player: result});
   }
 
   void removeFromDie(GamePlayer player) {
