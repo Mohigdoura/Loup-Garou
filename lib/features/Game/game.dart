@@ -55,7 +55,7 @@ class Game extends ConsumerWidget {
             ),
           );
         },
-        child: gameState.isNight ? NightPage() : DayPage(),
+        child: SafeArea(child: gameState.isNight ? NightPage() : DayPage()),
       ),
     );
   }

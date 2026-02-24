@@ -24,205 +24,207 @@ class _PickerPageState extends ConsumerState<PickerPage> {
     final names = ref.watch(namesProvider);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
+      body: SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            // Animated background stars
-            ...List.generate(20, (index) {
-              return Positioned(
-                left: (index * 41) % MediaQuery.of(context).size.width,
-                top: (index * 67) % MediaQuery.of(context).size.height,
-                child: Opacity(
-                  opacity: 0.2 + (index % 3) * 0.15,
-                  child: Container(
-                    width: 2 + (index % 3).toDouble(),
-                    height: 2 + (index % 3).toDouble(),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          blurRadius: 4,
-                          spreadRadius: 1,
-                        ),
-                      ],
+          child: Stack(
+            children: [
+              // Animated background stars
+              ...List.generate(20, (index) {
+                return Positioned(
+                  left: (index * 41) % MediaQuery.of(context).size.width,
+                  top: (index * 67) % MediaQuery.of(context).size.height,
+                  child: Opacity(
+                    opacity: 0.2 + (index % 3) * 0.15,
+                    child: Container(
+                      width: 2 + (index % 3).toDouble(),
+                      height: 2 + (index % 3).toDouble(),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
 
-            // Main content
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Role Assignment',
-                              style: TextStyle(
-                                fontSize: 28,
+              // Main content
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Role Assignment',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFd4af37),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Player ${currentIndex + 1} of ${names.length}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Progress indicator
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFd4af37), Color(0xFFf5e6d3)],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFd4af37,
+                                  ).withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              '${currentIndex + 1}/${names.length}',
+                              style: const TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFd4af37),
+                                color: Color(0xFF0a0e27),
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Player ${currentIndex + 1} of ${names.length}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ],
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Progress bar
+                      Container(
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(3),
                         ),
-                        // Progress indicator
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFd4af37), Color(0xFFf5e6d3)],
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFFd4af37,
-                                ).withValues(alpha: 0.3),
-                                blurRadius: 10,
-                                spreadRadius: 1,
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: (currentIndex + 1) / names.length,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFd4af37), Color(0xFFf5e6d3)],
                               ),
-                            ],
-                          ),
-                          child: Text(
-                            '${currentIndex + 1}/${names.length}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0a0e27),
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFd4af37,
+                                  ).withValues(alpha: 0.5),
+                                  blurRadius: 8,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Progress bar
-                    Container(
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(3),
                       ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: (currentIndex + 1) / names.length,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFd4af37), Color(0xFFf5e6d3)],
-                            ),
-                            borderRadius: BorderRadius.circular(3),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFFd4af37,
-                                ).withValues(alpha: 0.5),
-                                blurRadius: 8,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
 
-                    const Spacer(),
+                      const Spacer(),
 
-                    // Card
-                    GestureDetector(
-                      onTap: () {
-                        if (!isShown) {
-                          setState(() {
-                            isShown = true;
-                          });
-                        }
-                      },
-                      child: AnimatedCardFlip(
-                        role: currentRole,
-                        name: names[currentIndex],
-                        isShown: isShown,
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Instruction text or button
-                    if (isShown)
-                      _NextButton(
-                        isLastPlayer: currentIndex >= names.length - 1,
-                        onPressed: () {
-                          if (currentIndex < names.length - 1) {
+                      // Card
+                      GestureDetector(
+                        onTap: () {
+                          if (!isShown) {
                             setState(() {
-                              isShown = false;
-                              currentIndex++;
+                              isShown = true;
                             });
-
-                            Future.delayed(
-                              const Duration(milliseconds: 600),
-                              () {
-                                setState(() {
-                                  currentRole = ref.watch(
-                                    rolesProvider,
-                                  )[currentIndex];
-                                });
-                              },
-                            );
-                          } else {
-                            context.pushReplacement("/give-narrator");
                           }
                         },
-                      )
-                    else
-                      SizedBox(height: 64),
-
-                    const SizedBox(height: 16),
-
-                    if (kDebugMode)
-                      TextButton(
-                        onPressed: () {
-                          context.pushReplacement("/give-narrator");
-                        },
-                        child: Text(
-                          "Skip to game",
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
-                          ),
+                        child: AnimatedCardFlip(
+                          role: currentRole,
+                          name: names[currentIndex],
+                          isShown: isShown,
                         ),
                       ),
-                  ],
+
+                      const Spacer(),
+
+                      // Instruction text or button
+                      if (isShown)
+                        _NextButton(
+                          isLastPlayer: currentIndex >= names.length - 1,
+                          onPressed: () {
+                            if (currentIndex < names.length - 1) {
+                              setState(() {
+                                isShown = false;
+                                currentIndex++;
+                              });
+
+                              Future.delayed(
+                                const Duration(milliseconds: 600),
+                                () {
+                                  setState(() {
+                                    currentRole = ref.watch(
+                                      rolesProvider,
+                                    )[currentIndex];
+                                  });
+                                },
+                              );
+                            } else {
+                              context.pushReplacement("/give-narrator");
+                            }
+                          },
+                        )
+                      else
+                        SizedBox(height: 64),
+
+                      const SizedBox(height: 16),
+
+                      if (kDebugMode)
+                        TextButton(
+                          onPressed: () {
+                            context.pushReplacement("/give-narrator");
+                          },
+                          child: Text(
+                            "Skip to game",
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:loup_garou/features/Game/models/game_actions.dart';
+import 'package:loup_garou/features/Game/providers/game_actions.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
+import 'package:loup_garou/features/Game/providers/night_action_result.dart';
 
 enum Team { village, wolves, solo }
 
@@ -14,6 +15,7 @@ abstract class GameCharacter {
   String get ability;
   int get priority => 0;
   bool get visibleToSeer => true;
+  bool get hasDayAction => false;
   int get lives => 1;
 
   Future<void> nightAction({
@@ -21,10 +23,14 @@ abstract class GameCharacter {
     required GamePlayer self,
   }) async {}
 
-  Future<void> onKilled({
+  Future<void> dayAction({
     required GameActions actions,
     required GamePlayer self,
-    required GamePlayer killer,
+  }) async {}
+
+  Future<void> onKilled({
+    required GameActions actions,
+    required NightEvent nightEvent,
   }) async {}
   Future<void> onVotedOut({
     required GameActions actions,

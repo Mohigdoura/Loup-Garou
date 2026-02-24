@@ -306,19 +306,19 @@ class _DayPageState extends ConsumerState<DayPage>
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     List<GamePlayer> talkingOrder = gameState.talkingOrder;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF87CEEB), // Sky blue
-            Color(0xFFffd89b), // Warm yellow
-            Color(0xFFffa751), // Orange
-          ],
+    return SafeArea(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF87CEEB), // Sky blue
+              Color(0xFFffd89b), // Warm yellow
+              Color(0xFFffa751), // Orange
+            ],
+          ),
         ),
-      ),
-      child: SafeArea(
         child: Column(
           children: [
             // Header with animated sun
@@ -540,12 +540,25 @@ class _DayPageState extends ConsumerState<DayPage>
                                       : null,
                                 ),
                               ),
-                              trailing: isSilenced && isAlive
-                                  ? Icon(
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isSilenced && isAlive)
+                                    Icon(
                                       Icons.voice_over_off,
                                       color: Colors.red.shade700,
-                                    )
-                                  : null,
+                                    ),
+                                  if (isAlive && p.gameCharacter.hasDayAction)
+                                    IconButton(
+                                      icon: const Icon(Icons.auto_fix_high),
+                                      color: Colors.orange.shade700,
+                                      tooltip: 'Day Ability',
+                                      onPressed: () async {
+                                        await gameStateNotifier.dayAbility(p);
+                                      },
+                                    ),
+                                ],
+                              ),
                             ),
                           );
                         },

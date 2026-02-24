@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
-import 'package:loup_garou/features/Game/models/game_actions.dart';
+import 'package:loup_garou/features/Game/providers/game_actions.dart';
 import 'package:loup_garou/models/game_characters.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/providers/night_action_result.dart';
@@ -86,7 +86,7 @@ class GameStateNotifier extends Notifier<GameState> {
       players: _sortPlayers(
         state.players.map((p) {
           if (p.name == player.name) {
-            return p.copyWith(lives: 1);
+            return p.copyWith(lives: player.gameCharacter.lives);
           }
           return p;
         }).toList(),
@@ -94,43 +94,60 @@ class GameStateNotifier extends Notifier<GameState> {
     );
   }
 
+  Future<void> dayAbility(GamePlayer player) async {
+    await player.gameCharacter.dayAction(
+      actions: GameActions.fromNotifier(ref, this, state),
+      self: player,
+    );
+  }
+
   /// Kill a player and handle their onKilled ability
-  Future<void> killPlayer(GamePlayer player, GamePlayer killer) async {
-    // Check if player will actually die (check current lives)
+  Future<void> killPlayer(NightEvent event) async {
+    final player = event.player;
     final currentPlayer = state.players.firstWhere(
       (p) => p.name == player.name,
     );
     final willDie = currentPlayer.lives - 1 <= 0;
 
-    // Update player's lives
     state = state.copyWith(
       players: _sortPlayers(
         state.players.map((p) {
-          if (p.name == player.name) {
-            return p.copyWith(lives: p.lives - 1);
-          }
+          if (p.name == player.name) return p.copyWith(lives: p.lives - 1);
           return p;
         }).toList(),
       ),
     );
 
-    // If player died, trigger their onKilled ability
     if (willDie) {
       ref
           .read(nightContextProvider.notifier)
-          .addNightResult(player, Result.dead);
+          .addNightEvent(player, Result.killed);
+
       await player.gameCharacter.onKilled(
         actions: GameActions.fromNotifier(ref, this, state),
-        self: player,
-        killer: killer,
+        nightEvent: event,
       );
+
+      // ✅ Check AFTER onKilled so transformations (CursedChild) have already
+      // updated state. Now verify the player is actually dead, not transformed.
+      final playerAfterKill = state.players.firstWhere(
+        (p) => p.name == player.name,
+      );
+      final actuallyDead = playerAfterKill.isDead;
+
+      if (actuallyDead) {
+        _graveRobberCheck(player);
+      }
     }
   }
 
   void cursedChildKilled(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightResult(player, Result.transformed);
+        .addNightEvent(player, Result.transformed);
+    ref
+        .read(nightContextProvider.notifier)
+        .removeNightEvent(player, Result.killedByWolves);
 
     state = state.copyWith(
       players: _sortPlayers(
@@ -147,37 +164,34 @@ class GameStateNotifier extends Notifier<GameState> {
     );
   }
 
-  void _setTalkingOrder(String? startName, String? direction) {
-    final alive = getAlivePlayers();
-    if (alive.isEmpty) {
-      state = state.copyWith(talkingOrder: []);
-      return;
-    }
-    List<GamePlayer>? talkingOrder;
+  void _graveRobberCheck(GamePlayer deadPlayer) {
+    // Find all alive GraveRobbers watching this exact player
+    final watchers = state.players
+        .where(
+          (p) =>
+              p.isAlive &&
+              p.gameCharacter is GraveRobber &&
+              p.characterState['watchingTarget'] == deadPlayer.name,
+        )
+        .toList();
 
-    if (startName != null) {
-      final startIdx = alive.indexWhere((p) => p.name == startName);
-      if (startIdx == -1) {
-        // Player not found, use default order
-        talkingOrder = alive;
-      } else if (direction == 'clockwise') {
-        talkingOrder = [
-          ...alive.sublist(startIdx),
-          ...alive.sublist(0, startIdx),
-        ];
-      } else {
-        final reversed = alive.reversed.toList();
-        final revStartIdx = reversed.indexWhere((p) => p.name == startName);
-        talkingOrder = [
-          ...reversed.sublist(revStartIdx),
-          ...reversed.sublist(0, revStartIdx),
-        ];
-      }
-    } else {
-      talkingOrder = alive;
-    }
+    if (watchers.isEmpty) return;
 
-    state = state.copyWith(talkingOrder: talkingOrder);
+    final stolenRole = deadPlayer.gameCharacter;
+
+    // All watchers steal the role (handles multiple GraveRobbers)
+    state = state.copyWith(
+      players: state.players.map((p) {
+        if (watchers.any((w) => w.name == p.name)) {
+          return p.copyWith(
+            gameCharacter: stolenRole,
+            lives: stolenRole.lives,
+            characterState: {},
+          );
+        }
+        return p;
+      }).toList(),
+    );
   }
 
   void nextDay() {
@@ -252,23 +266,18 @@ class GameStateNotifier extends Notifier<GameState> {
   Future<void> _finalizeNight() async {
     // Filter out protected players (they survive)
     final night = ref.read(nightContextProvider);
+    final nightNotifier = ref.read(nightContextProvider.notifier);
 
-    final actuallyDying = night.toDie.entries
-        .where(
-          (entry) =>
-              !(night.protected.contains(entry.key) &&
-                  entry.value.gameCharacter.team == Team.wolves),
-        )
-        .toList();
+    final actuallyDying = nightNotifier.actuallyDying();
 
     // Kill each player (this may trigger additional deaths like Hunter's revenge)
     for (final player in actuallyDying) {
-      await killPlayer(player.key, player.value);
+      await killPlayer(player);
     }
     final startName = night.startName;
     final direction = night.direction;
 
-    _setTalkingOrder(startName, direction);
+    state = state.copyWith(startName: startName, direction: direction);
   }
 
   // Add this method to set special wins (e.g., from character abilities)
@@ -318,7 +327,7 @@ class GameStateNotifier extends Notifier<GameState> {
     }
 
     // Check for Serial Killer win
-    final alivePlayers = getAlivePlayers();
+    final alivePlayers = state.alivePlayers;
     if (alivePlayers.length == 1) {
       state = state.copyWith(
         winCondition: WinCondition(
@@ -332,10 +341,6 @@ class GameStateNotifier extends Notifier<GameState> {
     }
 
     return false;
-  }
-
-  List<GamePlayer> getAlivePlayers() {
-    return state.players.where((p) => p.isAlive).toList();
   }
 }
 

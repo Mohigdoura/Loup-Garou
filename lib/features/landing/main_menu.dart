@@ -13,151 +13,157 @@ class _MainMenuState extends ConsumerState<MainMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0a0e27),
-              const Color(0xFF1a1f3a),
-              const Color(0xFF2d1b3d),
-            ],
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF0a0e27),
+                const Color(0xFF1a1f3a),
+                const Color(0xFF2d1b3d),
+              ],
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            // Animated background stars
-            ...List.generate(30, (index) {
-              return Positioned(
-                left: (index * 37) % MediaQuery.of(context).size.width,
-                top: (index * 53) % MediaQuery.of(context).size.height,
-                child: Container(
-                  width: 2 + (index % 3).toDouble(),
-                  height: 2 + (index % 3).toDouble(),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        blurRadius: 4,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-            // Main content
-            SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(flex: 2),
-
-                  // Moon icon
-                  Container(
-                    width: 120,
-                    height: 120,
+          child: Stack(
+            children: [
+              // Animated background stars
+              ...List.generate(30, (index) {
+                return Positioned(
+                  left: (index * 37) % MediaQuery.of(context).size.width,
+                  top: (index * 53) % MediaQuery.of(context).size.height,
+                  child: Container(
+                    width: 2 + (index % 3).toDouble(),
+                    height: 2 + (index % 3).toDouble(),
                     decoration: BoxDecoration(
+                      color: Colors.white,
                       shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          const Color(0xFFf5e6d3),
-                          const Color(0xFFd4af37).withValues(alpha: 0.8),
-                        ],
-                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFd4af37).withValues(alpha: 0.4),
-                          blurRadius: 40,
-                          spreadRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: Image.asset('assets/wolf_nobg.png'),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Title
-                  Text(
-                    'LOUP GAROU',
-                    style: TextStyle(
-                      fontSize: 56,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 4,
-                      foreground: Paint()
-                        ..shader = const LinearGradient(
-                          colors: [Color(0xFFf5e6d3), Color(0xFFd4af37)],
-                        ).createShader(const Rect.fromLTWH(0, 0, 400, 70)),
-                      shadows: [
-                        Shadow(
-                          color: const Color(0xFFd4af37).withValues(alpha: 0.5),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
+                          color: Colors.white.withValues(alpha: 0.5),
+                          blurRadius: 4,
+                          spreadRadius: 1,
                         ),
                       ],
                     ),
                   ),
+                );
+              }),
+              // Main content
+              SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(flex: 2),
 
-                  const SizedBox(height: 8),
-
-                  Text(
-                    'The Werewolf Game',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w300,
-                      letterSpacing: 3,
-                      color: Colors.white.withValues(alpha: 0.6),
+                    // Moon icon
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            const Color(0xFFf5e6d3),
+                            const Color(0xFFd4af37).withValues(alpha: 0.8),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFd4af37,
+                            ).withValues(alpha: 0.4),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset('assets/wolf_nobg.png'),
                     ),
-                  ),
 
-                  const Spacer(flex: 1),
+                    const SizedBox(height: 40),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: _MenuButton(
-                      label: 'New Game',
-                      icon: Icons.play_arrow_rounded,
-                      onPressed: () {
-                        context.push('/name-selection');
-                      },
+                    // Title
+                    Text(
+                      'LOUP GAROU',
+                      style: TextStyle(
+                        fontSize: 56,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 4,
+                        foreground: Paint()
+                          ..shader = const LinearGradient(
+                            colors: [Color(0xFFf5e6d3), Color(0xFFd4af37)],
+                          ).createShader(const Rect.fromLTWH(0, 0, 400, 70)),
+                        shadows: [
+                          Shadow(
+                            color: const Color(
+                              0xFFd4af37,
+                            ).withValues(alpha: 0.5),
+                            blurRadius: 20,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: _MenuButton(
-                      label: 'Shop',
-                      icon: Icons.shopping_cart_outlined,
-                      onPressed: () {
-                        context.push('/shop');
-                      },
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'The Werewolf Game',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 3,
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                    const Spacer(flex: 1),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: _MenuButton(
-                      label: 'RULES',
-                      icon: Icons.menu_book_rounded,
-                      isSecondary: true,
-                      onPressed: () {
-                        _showRulesDialog(context);
-                      },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: _MenuButton(
+                        label: 'New Game',
+                        icon: Icons.play_arrow_rounded,
+                        onPressed: () {
+                          context.push('/name-selection');
+                        },
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
 
-                  const Spacer(flex: 1),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: _MenuButton(
+                        label: 'Shop',
+                        icon: Icons.shopping_cart_outlined,
+                        onPressed: () {
+                          context.push('/shop');
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: _MenuButton(
+                        label: 'RULES',
+                        icon: Icons.menu_book_rounded,
+                        isSecondary: true,
+                        onPressed: () {
+                          _showRulesDialog(context);
+                        },
+                      ),
+                    ),
+
+                    const Spacer(flex: 1),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

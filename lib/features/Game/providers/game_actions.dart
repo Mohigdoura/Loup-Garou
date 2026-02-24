@@ -15,6 +15,9 @@ class GameActions {
   // Constructor for use from within GameStateNotifier
   GameActions.fromNotifier(this.ref, this._stateNotifier, this._currentState);
 
+  // Instead of branching, unify access:
+  GameStateNotifier get _notifier =>
+      _stateNotifier ?? ref.read(gameStateProvider.notifier);
   GameState get state {
     if (_currentState != null) {
       return _currentState; // Use the snapshot
@@ -24,42 +27,41 @@ class GameActions {
 
   NightContext get nightContext => ref.read(nightContextProvider);
 
-  void addToDie(GamePlayer player, GamePlayer killer) {
-    ref.read(nightContextProvider.notifier).addToDie(player, killer);
+  void addKilledByWolves(GamePlayer player) {
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(player, Result.killedByWolves);
   }
 
-  void removeFromDie(GamePlayer player) {
-    ref.read(nightContextProvider.notifier).removeFromDie(player);
+  void addKilled(GamePlayer player) {
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(player, Result.killed);
+  }
+
+  void heal(GamePlayer player) {
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(player, Result.healed);
   }
 
   void addProtected(GamePlayer player) {
-    ref.read(nightContextProvider.notifier).addProtected(player);
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(player, Result.protected);
   }
 
   void updateCharacterState(GamePlayer player, Map<String, dynamic> updates) {
-    if (_stateNotifier != null) {
-      _stateNotifier.updateCharacterState(player, updates);
-    } else {
-      ref
-          .read(gameStateProvider.notifier)
-          .updateCharacterState(player, updates);
-    }
+    _notifier.updateCharacterState(player, updates);
   }
 
-  Future<void> killPlayer(GamePlayer player, GamePlayer killer) async {
-    if (_stateNotifier != null) {
-      await _stateNotifier.killPlayer(player, killer);
-    } else {
-      await ref.read(gameStateProvider.notifier).killPlayer(player, killer);
-    }
+  Future<void> killPlayer(GamePlayer player) async {
+    final nightEvent = NightEvent(player, Result.killed);
+    await _notifier.killPlayer(nightEvent);
   }
 
   void setSilenced(GamePlayer player) {
-    if (_stateNotifier != null) {
-      _stateNotifier.setSilenced(player);
-    } else {
-      ref.read(gameStateProvider.notifier).setSilenced(player);
-    }
+    _notifier.setSilenced(player);
   }
 
   void setStartNameAndDirection(String? name, String? direction) {
@@ -69,26 +71,14 @@ class GameActions {
   }
 
   void cursedChildKilled(GamePlayer player) {
-    if (_stateNotifier != null) {
-      _stateNotifier.cursedChildKilled(player);
-    } else {
-      ref.read(gameStateProvider.notifier).cursedChildKilled(player);
-    }
+    _notifier.cursedChildKilled(player);
   }
 
   void littlePrinceOnVotedOut(GamePlayer player) {
-    if (_stateNotifier != null) {
-      _stateNotifier.littlePrinceOnVotedOut(player);
-    } else {
-      ref.read(gameStateProvider.notifier).littlePrinceOnVotedOut(player);
-    }
+    _notifier.littlePrinceOnVotedOut(player);
   }
 
   void setWinCondition(WinCondition condition) {
-    if (_stateNotifier != null) {
-      _stateNotifier.setWinCondition(condition);
-    } else {
-      ref.read(gameStateProvider.notifier).setWinCondition(condition);
-    }
+    _notifier.setWinCondition(condition);
   }
 }

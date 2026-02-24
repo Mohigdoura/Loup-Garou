@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loup_garou/models/ad_state.dart';
@@ -13,13 +14,20 @@ class AdNotifier extends Notifier<AdState> {
   }
 
   // Test IDs - Replace with real ones for production
-  static const String _interstitialId =
-      'ca-app-pub-8471114413175146/6227692806';
-  static const String _rewardedId = 'ca-app-pub-8471114413175146/1272316386';
+  static const String _interstitialTestId =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const String _rewardedTestId =
+      'ca-app-pub-3940256099942544/5224354917';
 
+  static final String _interstitialId = kDebugMode
+      ? _interstitialTestId
+      : dotenv.env['INTERSTITIAL_ID'] ?? _interstitialTestId;
+  static final String _rewardedId = kDebugMode
+      ? _rewardedTestId
+      : dotenv.env['REWARDED_ID'] ?? _rewardedTestId;
   void loadInterstitial() {
     // Don't load if already loading or loaded
-    if (kDebugMode) return;
+
     if (state.isInterstitialLoaded || state.interstitialAd != null) return;
 
     InterstitialAd.load(
@@ -43,8 +51,6 @@ class AdNotifier extends Notifier<AdState> {
   }
 
   void loadRewarded() {
-    if (kDebugMode) return;
-
     // Don't load if already loading or loaded
     if (state.isRewardedLoaded || state.rewardedAd != null) return;
 

@@ -6,8 +6,7 @@ class GamePlayer {
   final GameCharacter gameCharacter;
   final int lives;
   final bool isSilenced;
-  final Map<String, dynamic>
-  characterState; // ✅ NEW: Per-player character state
+  final Map<String, dynamic> characterState;
 
   GamePlayer({
     required this.name,
@@ -20,7 +19,12 @@ class GamePlayer {
 
   bool get isAlive => lives > 0;
   bool get isDead => !isAlive;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is GamePlayer && other.name == name);
 
+  @override
+  int get hashCode => name.hashCode;
   GamePlayer copyWith({
     String? name,
     GameCharacter? gameCharacter,
@@ -40,33 +44,57 @@ class GamePlayer {
 
 class GameState {
   final List<GamePlayer> players;
-  final List<GamePlayer> talkingOrder;
+  final String? startName;
+  final String? direction;
   final int nightCount;
   final bool isNight;
   final WinCondition? winCondition;
 
   GameState({
     required this.players,
-    List<GamePlayer>? talkingOrder,
+    this.startName,
+    this.direction,
     this.nightCount = 1,
     this.isNight = true,
     this.winCondition,
-  }) : talkingOrder = talkingOrder ?? [...players];
+  });
 
   GameState copyWith({
     List<GamePlayer>? players,
-    List<GamePlayer>? talkingOrder,
+    String? startName,
+    String? direction,
     int? nightCount,
     bool? isNight,
     WinCondition? winCondition,
   }) {
     return GameState(
       players: players ?? this.players,
-      talkingOrder: talkingOrder ?? this.talkingOrder,
+      startName: startName ?? this.startName,
+      direction: direction ?? this.direction,
       nightCount: nightCount ?? this.nightCount,
       isNight: isNight ?? this.isNight,
       winCondition: winCondition ?? this.winCondition,
     );
+  }
+
+  List<GamePlayer> get talkingOrder {
+    final alive = players.where((p) => p.isAlive).toList();
+
+    if (startName == null) return alive;
+
+    final startIdx = alive.indexWhere((p) => p.name == startName);
+    if (startIdx == -1) return alive;
+
+    if (direction == 'clockwise') {
+      return [...alive.sublist(startIdx), ...alive.sublist(0, startIdx)];
+    } else {
+      final reversed = alive.reversed.toList();
+      final revStartIdx = reversed.indexWhere((p) => p.name == startName);
+      return [
+        ...reversed.sublist(revStartIdx),
+        ...reversed.sublist(0, revStartIdx),
+      ];
+    }
   }
 
   /// Helper: Get all alive players
@@ -90,13 +118,9 @@ class GameState {
       .where((p) => p.isAlive && p.gameCharacter.team == Team.solo)
       .toList();
 
-  /// Helper: Find player by name
+  // Prefer:
   GamePlayer? findPlayerByName(String name) {
-    try {
-      return players.firstWhere((p) => p.name == name);
-    } catch (e) {
-      return null;
-    }
+    return players.where((p) => p.name == name).firstOrNull;
   }
 
   /// Helper: Update a specific player

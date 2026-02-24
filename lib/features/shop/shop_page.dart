@@ -40,9 +40,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
         .getUnpurchasedRoles();
 
     return Scaffold(
-      body: Container(
-        decoration: _kBackgroundGradient,
-        child: SafeArea(
+      body: SafeArea(
+        child: Container(
+          decoration: _kBackgroundGradient,
           child: Column(
             children: [
               _buildHeader(context),

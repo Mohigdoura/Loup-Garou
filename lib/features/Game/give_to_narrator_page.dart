@@ -47,177 +47,186 @@ class _GiveToNarratorPageState extends State<GiveToNarratorPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
+      body: SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF0a0e27), Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            // Animated background stars
-            ...List.generate(30, (index) {
-              return Positioned(
-                left: (index * 37) % MediaQuery.of(context).size.width,
-                top: (index * 53) % MediaQuery.of(context).size.height,
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: (0.2 + (index % 3) * 0.2) * _fadeAnimation.value,
-                      child: Container(
-                        width: 2 + (index % 3).toDouble(),
-                        height: 2 + (index % 3).toDouble(),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              blurRadius: 4,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }),
-
-            // Main content
-            SafeArea(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Spacer(flex: 2),
-
-                      // Narrator icon with pulse animation
-                      Container(
-                        width: 140,
-                        height: 140,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              const Color(0xFFf5e6d3),
-                              const Color(0xFFd4af37).withValues(alpha: 0.8),
+          child: Stack(
+            children: [
+              // Animated background stars
+              ...List.generate(30, (index) {
+                return Positioned(
+                  left: (index * 37) % MediaQuery.of(context).size.width,
+                  top: (index * 53) % MediaQuery.of(context).size.height,
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return Opacity(
+                        opacity:
+                            (0.2 + (index % 3) * 0.2) * _fadeAnimation.value,
+                        child: Container(
+                          width: 2 + (index % 3).toDouble(),
+                          height: 2 + (index % 3).toDouble(),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.5),
+                                blurRadius: 4,
+                                spreadRadius: 1,
+                              ),
                             ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFFd4af37,
-                              ).withValues(alpha: 0.4),
-                              blurRadius: 40,
-                              spreadRadius: 10,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
+
+              // Main content
+              SafeArea(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Spacer(flex: 2),
+
+                        // Narrator icon with pulse animation
+                        Container(
+                          width: 140,
+                          height: 140,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                const Color(0xFFf5e6d3),
+                                const Color(0xFFd4af37).withValues(alpha: 0.8),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.menu_book_rounded,
-                          size: 80,
-                          color: Color(0xFF0a0e27),
-                        ),
-                      ),
-
-                      const SizedBox(height: 48),
-
-                      // Title
-                      Text(
-                        'Ready to Begin',
-                        style: TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          foreground: Paint()
-                            ..shader = const LinearGradient(
-                              colors: [Color(0xFFf5e6d3), Color(0xFFd4af37)],
-                            ).createShader(const Rect.fromLTWH(0, 0, 400, 70)),
-                          shadows: [
-                            Shadow(
-                              color: const Color(
-                                0xFFd4af37,
-                              ).withValues(alpha: 0.5),
-                              blurRadius: 20,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Instructions
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(
-                              0xFFd4af37,
-                            ).withValues(alpha: 0.3),
-                            width: 2,
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFFd4af37,
+                                ).withValues(alpha: 0.4),
+                                blurRadius: 40,
+                                spreadRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.menu_book_rounded,
+                            size: 80,
+                            color: Color(0xFF0a0e27),
                           ),
                         ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.transfer_within_a_station,
-                              size: 48,
-                              color: const Color(0xFFd4af37),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Pass the phone to\nthe Narrator',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(alpha: 0.95),
-                                height: 1.4,
-                                letterSpacing: 1,
+
+                        const SizedBox(height: 48),
+
+                        // Title
+                        Text(
+                          'Ready to Begin',
+                          style: TextStyle(
+                            fontSize: 42,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                            foreground: Paint()
+                              ..shader =
+                                  const LinearGradient(
+                                    colors: [
+                                      Color(0xFFf5e6d3),
+                                      Color(0xFFd4af37),
+                                    ],
+                                  ).createShader(
+                                    const Rect.fromLTWH(0, 0, 400, 70),
+                                  ),
+                            shadows: [
+                              Shadow(
+                                color: const Color(
+                                  0xFFd4af37,
+                                ).withValues(alpha: 0.5),
+                                blurRadius: 20,
+                                offset: const Offset(0, 4),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'The Narrator will guide the game\nthrough night and day phases',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withValues(alpha: 0.6),
-                                height: 1.5,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
 
-                      const Spacer(flex: 1),
+                        const SizedBox(height: 24),
 
-                      // Start button
-                      _StartGameButton(
-                        onPressed: () {
-                          context.pushReplacement("/game");
-                        },
-                      ),
+                        // Instructions
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFd4af37,
+                              ).withValues(alpha: 0.3),
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.transfer_within_a_station,
+                                size: 48,
+                                color: const Color(0xFFd4af37),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Pass the phone to\nthe Narrator',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                  height: 1.4,
+                                  letterSpacing: 1,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'The Narrator will guide the game\nthrough night and day phases',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
 
-                      const Spacer(flex: 2),
-                    ],
+                        const Spacer(flex: 1),
+
+                        // Start button
+                        _StartGameButton(
+                          onPressed: () {
+                            context.pushReplacement("/game");
+                          },
+                        ),
+
+                        const Spacer(flex: 2),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

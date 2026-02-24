@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -105,8 +103,10 @@ class _NightPageState extends ConsumerState<NightPage>
 
   /// Show night results by comparing before/after state
   Future<void> _showNightResults() async {
-    final nightResults = ref.read(nightContextProvider).nightResult.entries;
-    log("night results: $nightResults");
+    List<NightEvent> nightResults = ref
+        .read(nightContextProvider.notifier)
+        .showNightResults();
+
     await showDialog(
       context: context,
       builder: (_) => Dialog(
@@ -165,17 +165,22 @@ class _NightPageState extends ConsumerState<NightPage>
                             ),
                           ),
                           const SizedBox(height: 8),
-                          for (var result in nightResults)
+                          for (var nightEvent in nightResults)
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Text(
-                                '${result.key.name} (${result.key.gameCharacter.name}) : ${result.value.name}',
+                                '${nightEvent.player.name} (${nightEvent.player.gameCharacter.name}) : ${nightEvent.result.name}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color: result.value == Result.dead
+                                  color:
+                                      nightEvent.result ==
+                                              Result.killedByWolves ||
+                                          nightEvent.result == Result.killed
                                       ? Colors.red
-                                      : Colors.purple,
+                                      : nightEvent.result == Result.transformed
+                                      ? Colors.purple
+                                      : Colors.blue,
                                 ),
                                 textAlign: TextAlign.center,
                               ),

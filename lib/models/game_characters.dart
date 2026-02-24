@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
+import 'package:loup_garou/features/Game/providers/night_action_result.dart';
 import 'package:loup_garou/main.dart';
-import 'package:loup_garou/features/Game/models/game_actions.dart';
+import 'package:loup_garou/features/Game/providers/game_actions.dart';
+import 'package:loup_garou/models/character_ui.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 
@@ -56,184 +58,7 @@ class _WitchActionButton extends StatelessWidget {
   }
 }
 
-Future<String?> _pickPlayer(
-  String title,
-  List<String> options,
-  IconData icon,
-  Color color,
-) async {
-  final names = List<String>.from(options);
-  names.add("None");
-  return await showDialog<String>(
-    context: navigatorKey.currentContext!,
-    barrierDismissible: false,
-    builder: (_) => Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: const BoxConstraints(maxHeight: 500),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withValues(alpha: 0.5), width: 2),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Icon(icon, color: color),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(color: Colors.white24),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: names.length,
-                itemBuilder: (context, index) {
-                  final name = names[index];
-                  return InkWell(
-                    onTap: () => Navigator.pop(
-                      navigatorKey.currentContext!,
-                      name == "None" ? null : name,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.1),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
 /// Show wake-up dialog for a character
-Future<void> _wakePhase(
-  String title,
-  String name,
-  IconData icon,
-  Color color,
-) async {
-  await showDialog(
-    context: navigatorKey.currentContext!,
-    barrierDismissible: false,
-    builder: (_) => Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withValues(alpha: 0.5), width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.3),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-                border: Border.all(color: color, width: 2),
-              ),
-              child: Icon(icon, size: 48, color: color),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Wake the $title',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Please wake $name and perform their action.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(navigatorKey.currentContext!),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'CONTINUE',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
 
 /// Get color for a character type
 Color _getColorForCharacter(GameCharacter character) {
@@ -254,6 +79,8 @@ Color _getColorForCharacter(GameCharacter character) {
       return Colors.red.shade700;
     case Hunter:
       return Colors.orange.shade600;
+    case Barbie:
+      return Colors.pinkAccent;
     default:
       return Colors.white;
   }
@@ -284,11 +111,11 @@ class Ancient extends GameCharacter {
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    await _wakePhase(
-      self.gameCharacter.name,
-      self.name,
-      self.gameCharacter.icon,
-      _getColorForCharacter(self.gameCharacter),
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
 
@@ -378,11 +205,11 @@ class Seer extends GameCharacter {
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    await _wakePhase(
-      self.gameCharacter.name,
-      self.name,
-      self.gameCharacter.icon,
-      _getColorForCharacter(self.gameCharacter),
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
     final targets = state.players
@@ -390,78 +217,26 @@ class Seer extends GameCharacter {
         .map((p) => p.name)
         .toList();
 
-    final target = await _pickPlayer(
-      'Seer: choose someone to see',
-      targets,
-      FontAwesomeIcons.eye,
-      _getColorForCharacter(self.gameCharacter),
+    final target = await CharacterUI.pickPlayer(
+      title: 'Seer: choose someone to see',
+      options: targets,
+      icon: FontAwesomeIcons.eye,
+      color: _getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {
-      final found = state.players.firstWhere((p) => p.name == target);
+      final found = state.players.where((p) => p.name == target).firstOrNull;
+      if (found == null) return;
       final isWolf = checkPlayerIfWolf(found.gameCharacter);
       final result = isWolf ? 'is a wolf' : 'is not a wolf';
 
-      await showDialog(
-        context: navigatorKey.currentContext!,
-        builder: (_) => Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1a1f3a), Color(0xFF2d1b3d)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: (isWolf ? Colors.red.shade700 : Colors.blue.shade400)
-                    .withValues(alpha: 0.5),
-                width: 2,
-              ),
-            ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isWolf ? Icons.pets : Icons.home,
-                  size: 64,
-                  color: isWolf ? Colors.red.shade700 : Colors.blue.shade400,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Seer Result',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: isWolf ? Colors.red.shade700 : Colors.blue.shade400,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '$target $result',
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(navigatorKey.currentContext!),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isWolf
-                        ? Colors.red.shade700
-                        : Colors.blue.shade400,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 12,
-                    ),
-                  ),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          ),
-        ),
+      await CharacterUI.showResult(
+        title: 'Seer Result',
+        message: target + ' ' + result,
+        icon: isWolf ? Icons.pets : Icons.home,
+        color: isWolf ? Colors.red.shade700 : Colors.blue.shade400,
+        tag: 'NIGHT RESULT', // optional badge
+        buttonLabel: 'GOT IT', // optional override
       );
     }
   }
@@ -479,19 +254,18 @@ class Protector extends GameCharacter {
   @override
   IconData get icon => FontAwesomeIcons.shield;
   @override
-  int get priority => 80;
+  int get priority => 110;
 
   @override
   Future<void> nightAction({
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    await _wakePhase(
-      self.gameCharacter.name,
-      self.name,
-
-      self.gameCharacter.icon,
-      _getColorForCharacter(self.gameCharacter),
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
 
@@ -501,17 +275,20 @@ class Protector extends GameCharacter {
         .map((p) => p.name)
         .toList();
 
-    final target = await _pickPlayer(
-      'Protector: choose who to protect',
-      targets,
-      FontAwesomeIcons.shield,
-      _getColorForCharacter(self.gameCharacter),
+    final target = await CharacterUI.pickPlayer(
+      title: 'Protector: choose who to protect',
+      options: targets,
+      icon: FontAwesomeIcons.shield,
+      color: _getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {
       // ✅ Need to update the player's state in GameStateNotifier
       // This requires adding a method to update character state
-      final targetPlayer = state.players.firstWhere((p) => p.name == target);
+      final targetPlayer = state.players
+          .where((p) => p.name == target)
+          .firstOrNull;
+      if (targetPlayer == null) return;
       actions.addProtected(targetPlayer);
       actions.updateCharacterState(self, {'lastProtected': target});
     }
@@ -550,12 +327,11 @@ class Witch extends GameCharacter {
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    await _wakePhase(
-      self.gameCharacter.name,
-      self.name,
-
-      self.gameCharacter.icon,
-      _getColorForCharacter(self.gameCharacter),
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
     final night = actions.nightContext;
@@ -564,12 +340,15 @@ class Witch extends GameCharacter {
 
     String? tempHealTarget;
     String? tempKillTarget;
-    // return first key where value.team is team.wolf
-    final wolvesTarget = night.toDie.entries
-        .where((entry) => entry.value.gameCharacter.team == Team.wolves)
-        .map((entry) => entry.key)
-        .firstOrNull
-        ?.name;
+
+    final killedPlayers = night.nightEvents
+        .where(
+          (element) =>
+              element.result == Result.killedByWolves ||
+              element.result == Result.killed,
+        )
+        .map((e) => e.player.name)
+        .toList();
 
     while (true) {
       final action = await showDialog<String>(
@@ -615,7 +394,7 @@ class Witch extends GameCharacter {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Died tonight: ${wolvesTarget ?? 'no one'}',
+                    'Died tonight: ${killedPlayers.isNotEmpty ? killedPlayers.join(', ') : 'no one'}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
@@ -686,8 +465,26 @@ class Witch extends GameCharacter {
 
       if (action == 'skip' || action == null) return;
 
-      if (action == 'heal' && wolvesTarget != null) {
-        tempHealTarget = wolvesTarget;
+      if (action == 'heal') {
+        if (killedPlayers.isEmpty) {
+          // No one died tonight, nothing to heal
+          continue;
+        }
+
+        if (killedPlayers.length == 1) {
+          // Only one option, auto-select
+          tempHealTarget = killedPlayers.first;
+          continue;
+        }
+
+        // Let witch pick who to heal from the dead players
+        final healPick = await CharacterUI.pickPlayer(
+          title: 'Witch: choose someone to heal',
+          options: killedPlayers,
+          icon: Icons.favorite,
+          color: Colors.red.shade400,
+        );
+        tempHealTarget = healPick;
         continue;
       }
       if (action == 'no heal') {
@@ -696,15 +493,15 @@ class Witch extends GameCharacter {
       }
       if (action == 'kill') {
         List<String> choices = state.players
-            .where((p) => p.isAlive)
+            .where((p) => p.isAlive && p.name != self.name)
             .map((p) => p.name)
             .toList();
 
-        final target = await _pickPlayer(
-          'Witch: choose someone to poison',
-          choices,
-          Icons.dangerous,
-          _getColorForCharacter(self.gameCharacter),
+        final target = await CharacterUI.pickPlayer(
+          title: 'Witch: choose someone to poison',
+          options: choices,
+          icon: Icons.dangerous,
+          color: _getColorForCharacter(self.gameCharacter),
         );
         tempKillTarget = target;
         continue;
@@ -712,21 +509,22 @@ class Witch extends GameCharacter {
 
       if (action == 'confirm') {
         if (tempHealTarget != null) {
-          final healTarget = state.players.firstWhere(
-            (p) => p.name == tempHealTarget,
-          );
-
+          final healTarget = state.players
+              .where((p) => p.name == tempHealTarget)
+              .firstOrNull;
+          if (healTarget == null) return;
           actions.updateCharacterState(self, {'hasHeal': false});
-          actions.removeFromDie(healTarget);
+          actions.heal(healTarget);
         }
 
         if (tempKillTarget != null) {
-          final killTarget = state.players.firstWhere(
-            (p) => p.name == tempKillTarget,
-          );
+          final killTarget = state.players
+              .where((p) => p.name == tempKillTarget)
+              .firstOrNull;
+          if (killTarget == null) return;
 
           actions.updateCharacterState(self, {'hasKill': false});
-          actions.addToDie(killTarget, self);
+          actions.addKilled(killTarget);
         }
         return;
       }
@@ -747,16 +545,16 @@ class Hunter extends GameCharacter {
   @override
   Future<void> onKilled({
     required GameActions actions,
-    required GamePlayer self,
-    required GamePlayer killer,
+    required NightEvent nightEvent,
   }) async {
-    if (killer.gameCharacter.team == Team.wolves) {
+    if (nightEvent.result == Result.killedByWolves) {
       // Find first alive wolf
       final state = actions.state;
-      final firstWolf = state.players.firstWhere(
-        (p) => p.isAlive && p.gameCharacter.team == Team.wolves,
-      );
-      await actions.killPlayer(firstWolf, self);
+      final firstWolf = state.players
+          .where((p) => p.isAlive && p.gameCharacter.team == Team.wolves)
+          .firstOrNull;
+      if (firstWolf == null) return;
+      await actions.killPlayer(firstWolf);
     }
   }
 }
@@ -774,16 +572,15 @@ class Avenger extends GameCharacter {
   @override
   Future<void> onKilled({
     required GameActions actions,
-    required GamePlayer self,
-    required GamePlayer killer,
+    required NightEvent nightEvent,
   }) async {
     // Find the next alive player after this player
     final state = actions.state;
-    final thisPlayerIndex = state.players.indexOf(self);
+    final thisPlayerIndex = state.alivePlayers.indexOf(nightEvent.player);
     final lastPlayer = state.players.length - 1;
     final nextPlayer = (thisPlayerIndex + 1) % (lastPlayer + 1);
     final nextAlivePlayer = state.players[nextPlayer];
-    await actions.killPlayer(nextAlivePlayer, self);
+    await actions.killPlayer(nextAlivePlayer);
   }
 }
 
@@ -803,6 +600,102 @@ class LittlePrince extends GameCharacter {
     required GamePlayer self,
   }) async {
     actions.littlePrinceOnVotedOut(self);
+  }
+}
+
+class Barbie extends GameCharacter {
+  @override
+  String get name => "Barbie";
+  @override
+  Team get team => Team.village;
+  @override
+  IconData get icon => FontAwesomeIcons.wandMagicSparkles;
+  @override
+  int get priority => 120;
+  @override
+  bool get hasDayAction => true;
+  @override
+  String get ability =>
+      'can make everyone sleep during daytime and chooses who to kill.';
+
+  @override
+  Future<void> nightAction({
+    required GameActions actions,
+    required GamePlayer self,
+  }) async {
+    if (actions.state.nightCount == 1) {
+      await CharacterUI.showWakePhase(
+        title: self.gameCharacter.name,
+        name: self.name,
+        icon: self.gameCharacter.icon,
+        color: _getColorForCharacter(self.gameCharacter),
+      );
+      await CharacterUI.pickSignal<String>(
+        characterName: 'Barbie',
+        characterIcon: FontAwesomeIcons.wandMagicSparkles,
+        characterColor: Colors.pinkAccent,
+        prompt: 'Choose your daytime signal',
+      );
+    }
+  }
+
+  @override
+  Future<void> dayAction({
+    required GameActions actions,
+    required GamePlayer self,
+  }) async {
+    final hasBullet = self.characterState['hasBullet'] as bool? ?? true;
+    if (!hasBullet) {
+      return;
+    }
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
+    );
+
+    final state = actions.state;
+
+    final targets = state.players
+        .where((p) => p.isAlive && p.name != self.name)
+        .map((p) => p.name)
+        .toList();
+
+    final target = await CharacterUI.pickPlayer(
+      title: 'Barbie: choose who to kill',
+      options: targets,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
+    );
+    if (target != null) {
+      final targetPlayer = state.alivePlayers
+          .where((p) => p.name == target)
+          .firstOrNull;
+      if (targetPlayer == null) return;
+      if (targetPlayer.gameCharacter.name == 'Ancient') {
+        await actions.killPlayer(self);
+        await CharacterUI.showResult(
+          title: 'Died Today',
+          message: self.name + ' killed himself',
+          icon: self.gameCharacter.icon,
+          color: _getColorForCharacter(self.gameCharacter),
+          tag: 'Barbie RESULT', // optional badge
+          buttonLabel: 'GOT IT', // optional override
+        );
+      } else {
+        await actions.killPlayer(targetPlayer);
+        await CharacterUI.showResult(
+          title: 'Died Today',
+          message: target + ' was killed',
+          icon: self.gameCharacter.icon,
+          color: _getColorForCharacter(self.gameCharacter),
+          tag: 'Barbie RESULT', // optional badge
+          buttonLabel: 'GOT IT', // optional override
+        );
+        actions.updateCharacterState(self, {'hasBullet': false});
+      }
+    }
   }
 }
 
@@ -830,27 +723,31 @@ class SimpleWolf extends GameCharacter {
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    await _wakePhase(
-      "Wolves",
-      "The Wolves",
-      self.gameCharacter.icon,
-      _getColorForCharacter(SimpleWolf()),
+    await CharacterUI.showWakePhase(
+      title: "Wolves",
+      name: "The Wolves",
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(SimpleWolf()),
     );
     final state = actions.state;
     final targets = state.players
         .where((p) => p.isAlive && p.gameCharacter.team != Team.wolves)
         .map((p) => p.name)
         .toList();
-    final target = await _pickPlayer(
-      'Wolves: choose a victim',
-      targets,
-      Icons.pets,
-      _getColorForCharacter(SimpleWolf()),
+    final target = await CharacterUI.pickPlayer(
+      title: 'Wolves: choose a victim',
+      options: targets,
+      icon: Icons.pets,
+      color: _getColorForCharacter(SimpleWolf()),
+      allowNone: false,
     );
 
     if (target != null) {
-      final targetPlayer = state.players.firstWhere((p) => p.name == target);
-      actions.addToDie(targetPlayer, self);
+      final targetPlayer = state.players
+          .where((p) => p.name == target)
+          .firstOrNull;
+      if (targetPlayer == null) return;
+      actions.addKilledByWolves(targetPlayer);
     }
   }
 }
@@ -897,11 +794,11 @@ class BlackWolf extends SimpleWolf {
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    await _wakePhase(
-      self.gameCharacter.name,
-      self.name,
-      self.gameCharacter.icon,
-      _getColorForCharacter(self.gameCharacter),
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
     final lastSilenced = self.characterState['lastSilenced'] as String?;
@@ -916,19 +813,21 @@ class BlackWolf extends SimpleWolf {
         .map((p) => p.name)
         .toList();
 
-    final silenceTarget = await _pickPlayer(
-      'Black werewolf: choose to silence',
-      silenceTargets,
-      Icons.voice_over_off,
-      _getColorForCharacter(self.gameCharacter),
+    final silenceTarget = await CharacterUI.pickPlayer(
+      title: 'Black werewolf: choose to silence',
+      options: silenceTargets,
+      icon: Icons.voice_over_off,
+      color: _getColorForCharacter(self.gameCharacter),
+      allowNone: false,
     );
 
     if (silenceTarget != null) {
       actions.updateCharacterState(self, {'lastSilenced': silenceTarget});
 
-      final silencedPlayer = state.players.firstWhere(
-        (p) => p.name == silenceTarget,
-      );
+      final silencedPlayer = state.players
+          .where((p) => p.name == silenceTarget)
+          .firstOrNull;
+      if (silencedPlayer == null) return;
 
       actions.setSilenced(silencedPlayer);
     }
@@ -952,11 +851,10 @@ class CursedChild extends GameCharacter {
   @override
   Future<void> onKilled({
     required GameActions actions,
-    required GamePlayer self,
-    required GamePlayer killer,
+    required NightEvent nightEvent,
   }) async {
-    if (killer.gameCharacter.team == Team.wolves) {
-      actions.cursedChildKilled(self);
+    if (nightEvent.result == Result.killedByWolves) {
+      actions.cursedChildKilled(nightEvent.player);
       return;
     }
   }
@@ -1008,25 +906,69 @@ class SerialKiller extends GameCharacter {
     required GameActions actions,
     required GamePlayer self,
   }) async {
-    final alivePlayers = actions.state.alivePlayers
-        .where((p) => p.name != self.name)
+    final options = actions.state.players
+        .where((p) => p.isAlive && p.name != self.name)
+        .map((p) => p.name)
         .toList();
-    await _wakePhase(
-      self.gameCharacter.name,
-      self.name,
-      self.gameCharacter.icon,
-      _getColorForCharacter(self.gameCharacter),
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
 
-    final target = await _pickPlayer(
-      'Serial Killer: choose to kill',
-      alivePlayers.map((p) => p.name).toList(),
-      FontAwesomeIcons.skullCrossbones,
-      _getColorForCharacter(self.gameCharacter),
+    final target = await CharacterUI.pickPlayer(
+      title: 'Serial Killer: choose to kill',
+      options: options,
+      icon: FontAwesomeIcons.skullCrossbones,
+      color: _getColorForCharacter(self.gameCharacter),
     );
-    final targetPlayer = actions.state.players.firstWhere(
-      (p) => p.name == target,
+    final targetPlayer = actions.state.players
+        .where((p) => p.name == target)
+        .firstOrNull;
+    if (targetPlayer == null) return;
+    actions.addKilled(targetPlayer);
+  }
+}
+
+class GraveRobber extends GameCharacter {
+  @override
+  String get name => "Grave Robber";
+
+  @override
+  Team get team => Team.solo;
+  @override
+  IconData get icon => FontAwesomeIcons.breadSlice;
+  @override
+  String get ability =>
+      "Can choose a player each night, if that player dies he takes his role.";
+  @override
+  Future<void> nightAction({
+    required GameActions actions,
+    required GamePlayer self,
+  }) async {
+    final options = actions.state.players
+        .where((p) => p.isAlive && p.name != self.name)
+        .map((e) => e.name)
+        .toList();
+
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: _getColorForCharacter(self.gameCharacter),
     );
-    actions.addToDie(targetPlayer, self);
+
+    final target = await CharacterUI.pickPlayer(
+      title: 'Grave Robber: choose who to watch',
+      options: options,
+      icon: icon,
+      color: _getColorForCharacter(self.gameCharacter),
+    );
+
+    if (target != null) {
+      // Save target so _finalizeNight can check it
+      actions.updateCharacterState(self, {'watchingTarget': target});
+    }
   }
 }
