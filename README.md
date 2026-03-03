@@ -1,16 +1,33 @@
-# loup_garou
+# 🐺 Loup Garou (Werewolf) - Flutter Mobile
 
-A new Flutter project.
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME)
+[![Framework](https://img.shields.io/badge/Framework-Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Getting Started
+A fully automated digital companion for the social deduction game **Loup Garou**. Built with Flutter, this app eliminates the need for a human moderator by handling role distribution, night actions, and voting logic programmatically.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Features
+* **Automated Game Master:** Logic-driven phase transitions (Night/Day cycles).
+* **Role Management:** Support for Werewolves, Villagers, Seer, and more.
+* **Voting System:** Integrated logic to calculate majority and elimination.
+* **Production Ready:** Officially published on the Google Play Store.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🛠 Tech Stack & Environment
+* **Framework:** Flutter (Dart)
+* **State Management:** Riverpod
+* **IDE:** VS Code / Android Studio
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📦 Installation & Build
+To run this project locally, ensure you have the Flutter SDK configured.
+
+```bash
+# 1. Clone the repository
+git clone [https://github.com/Mohigdoura/Loup-Garou.git](https://github.com/Mohigdoura/Loup-Garou.git)
+
+# 2. Install dependencies
+flutter pub get
+
+# 3. Run the app (on connected device)
+flutter run
