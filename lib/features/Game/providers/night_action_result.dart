@@ -1,7 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 
-enum Result { killed, healed, killedByWolves, transformed, seen, protected }
+enum Result {
+  killed,
+  healed,
+  killedByWolves,
+  transformed,
+  seen,
+  protected,
+  roleStolen,
+}
 
 class NightEvent {
   final GamePlayer player;
@@ -54,7 +62,10 @@ class NightContextNotifier extends Notifier<NightContext> {
     final results = state.nightEvents
         .where(
           (event) =>
-              event.result == Result.seen || event.result == Result.transformed,
+              event.result != Result.killedByWolves &&
+              event.result != Result.killed &&
+              event.result != Result.healed &&
+              event.result != Result.protected,
         )
         .toList();
     results.addAll(actuallyDying());
@@ -76,14 +87,17 @@ class NightContextNotifier extends Notifier<NightContext> {
         (element) => element.player.name == protectedPlayer.player.name,
       );
     }
+     List<NightEvent> killedPlayers = state.nightEvents
+        .where((event) => event.result == Result.killed)
+        .toList();
     for (var healedPlayer in healedPlayers) {
       killedByWolvesPlayers.removeWhere(
         (element) => element.player.name == healedPlayer.player.name,
       );
+      killedPlayers.removeWhere(
+        (element) => element.player.name == healedPlayer.player.name,
+      );
     }
-    List<NightEvent> killedPlayers = state.nightEvents
-        .where((event) => event.result == Result.killed)
-        .toList();
     killedPlayers.addAll(killedByWolvesPlayers);
     // Deduplicate by player name
     return killedPlayers.fold<List<NightEvent>>([], (acc, e) {

@@ -21,12 +21,23 @@ class ShopNotifier extends Notifier<Set<String>> {
     return !isPurchased(roleName) && currentCoins >= price;
   }
 
+  void unlockAllRoles(List<String> roleNames) async {
+    final prefs = ref.read(sharedPrefsProvider);
+
+    // Save to persistent storage
+    await prefs.setStringList('purchased_roles', roleNames.toList());
+
+    // Update state to notify listeners
+    state = {...roleNames};
+  }
+
   /// Purchase a role and persist to storage
   Future<void> purchaseRole(String roleName, int price) async {
     if (state.contains(roleName)) {
       log("Role $roleName already purchased");
       return;
     }
+
     // Deduct coins
     await ref.read(coinsProvider.notifier).decrementCoins(price);
 

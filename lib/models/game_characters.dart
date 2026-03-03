@@ -58,34 +58,6 @@ class _WitchActionButton extends StatelessWidget {
   }
 }
 
-/// Show wake-up dialog for a character
-
-/// Get color for a character type
-Color _getColorForCharacter(GameCharacter character) {
-  switch (character.runtimeType) {
-    case Seer:
-      return Colors.purple.shade400;
-    case Protector:
-      return Colors.blue.shade400;
-    case Witch:
-      return Colors.green.shade400;
-    case Ancient:
-      return Colors.amber.shade700;
-    case BlackWolf:
-      return Colors.grey.shade700;
-    case WhiteWolf:
-      return Colors.grey;
-    case SimpleWolf:
-      return Colors.red.shade700;
-    case Hunter:
-      return Colors.orange.shade600;
-    case Barbie:
-      return Colors.pinkAccent;
-    default:
-      return Colors.white;
-  }
-}
-
 // ============================================================================
 // VILLAGE TEAM ROLES
 // ============================================================================
@@ -115,7 +87,7 @@ class Ancient extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
 
@@ -209,7 +181,7 @@ class Seer extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
     final targets = state.players
@@ -221,7 +193,7 @@ class Seer extends GameCharacter {
       title: 'Seer: choose someone to see',
       options: targets,
       icon: FontAwesomeIcons.eye,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {
@@ -238,6 +210,9 @@ class Seer extends GameCharacter {
         tag: 'NIGHT RESULT', // optional badge
         buttonLabel: 'GOT IT', // optional override
       );
+      if (isWolf) {
+        actions.addSeen(found);
+      }
     }
   }
 }
@@ -265,7 +240,7 @@ class Protector extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
 
@@ -279,7 +254,7 @@ class Protector extends GameCharacter {
       title: 'Protector: choose who to protect',
       options: targets,
       icon: FontAwesomeIcons.shield,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {
@@ -291,6 +266,56 @@ class Protector extends GameCharacter {
       if (targetPlayer == null) return;
       actions.addProtected(targetPlayer);
       actions.updateCharacterState(self, {'lastProtected': target});
+    }
+  }
+}
+
+class Healer extends GameCharacter {
+  @override
+  String get name => "Healer";
+  @override
+  Team get team => Team.village;
+
+  @override
+  String get ability => 'Heals one player each night.';
+  @override
+  IconData get icon => FontAwesomeIcons.heartCircleCheck;
+  @override
+  int get priority => 10;
+
+  @override
+  Future<void> nightAction({
+    required GameActions actions,
+    required GamePlayer self,
+  }) async {
+    await CharacterUI.showWakePhase(
+      title: self.gameCharacter.name,
+      name: self.name,
+      icon: self.gameCharacter.icon,
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
+    );
+    final state = actions.state;
+
+    final lastProtected = self.characterState['lastHealed'] as String?;
+    final targets = state.players
+        .where((p) => p.isAlive && p.name != lastProtected)
+        .map((p) => p.name)
+        .toList();
+
+    final target = await CharacterUI.pickPlayer(
+      title: 'Healer: choose who to heal',
+      options: targets,
+      icon: FontAwesomeIcons.heartCircleCheck,
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
+    );
+
+    if (target != null) {
+      final targetPlayer = state.players
+          .where((p) => p.name == target)
+          .firstOrNull;
+      if (targetPlayer == null) return;
+      actions.heal(targetPlayer);
+      actions.updateCharacterState(self, {'lastHealed': target});
     }
   }
 }
@@ -320,7 +345,7 @@ class Witch extends GameCharacter {
   Team get team => Team.village;
 
   @override
-  int get priority => 10;
+  int get priority => 30;
 
   @override
   Future<void> nightAction({
@@ -331,7 +356,7 @@ class Witch extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
     final night = actions.nightContext;
@@ -501,7 +526,7 @@ class Witch extends GameCharacter {
           title: 'Witch: choose someone to poison',
           options: choices,
           icon: Icons.dangerous,
-          color: _getColorForCharacter(self.gameCharacter),
+          color: CharacterUI.getColorForCharacter(self.gameCharacter),
         );
         tempKillTarget = target;
         continue;
@@ -554,6 +579,7 @@ class Hunter extends GameCharacter {
           .where((p) => p.isAlive && p.gameCharacter.team == Team.wolves)
           .firstOrNull;
       if (firstWolf == null) return;
+      actions.addKilled(firstWolf);
       await actions.killPlayer(firstWolf);
     }
   }
@@ -580,6 +606,7 @@ class Avenger extends GameCharacter {
     final lastPlayer = state.players.length - 1;
     final nextPlayer = (thisPlayerIndex + 1) % (lastPlayer + 1);
     final nextAlivePlayer = state.players[nextPlayer];
+    actions.addKilled(nextAlivePlayer);
     await actions.killPlayer(nextAlivePlayer);
   }
 }
@@ -628,7 +655,7 @@ class Barbie extends GameCharacter {
         title: self.gameCharacter.name,
         name: self.name,
         icon: self.gameCharacter.icon,
-        color: _getColorForCharacter(self.gameCharacter),
+        color: CharacterUI.getColorForCharacter(self.gameCharacter),
       );
       await CharacterUI.pickSignal<String>(
         characterName: 'Barbie',
@@ -652,7 +679,7 @@ class Barbie extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     final state = actions.state;
@@ -666,7 +693,7 @@ class Barbie extends GameCharacter {
       title: 'Barbie: choose who to kill',
       options: targets,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     if (target != null) {
       final targetPlayer = state.alivePlayers
@@ -679,7 +706,7 @@ class Barbie extends GameCharacter {
           title: 'Died Today',
           message: self.name + ' killed himself',
           icon: self.gameCharacter.icon,
-          color: _getColorForCharacter(self.gameCharacter),
+          color: CharacterUI.getColorForCharacter(self.gameCharacter),
           tag: 'Barbie RESULT', // optional badge
           buttonLabel: 'GOT IT', // optional override
         );
@@ -689,7 +716,7 @@ class Barbie extends GameCharacter {
           title: 'Died Today',
           message: target + ' was killed',
           icon: self.gameCharacter.icon,
-          color: _getColorForCharacter(self.gameCharacter),
+          color: CharacterUI.getColorForCharacter(self.gameCharacter),
           tag: 'Barbie RESULT', // optional badge
           buttonLabel: 'GOT IT', // optional override
         );
@@ -727,7 +754,7 @@ class SimpleWolf extends GameCharacter {
       title: "Wolves",
       name: "The Wolves",
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(SimpleWolf()),
+      color: CharacterUI.getColorForCharacter(SimpleWolf()),
     );
     final state = actions.state;
     final targets = state.players
@@ -738,7 +765,7 @@ class SimpleWolf extends GameCharacter {
       title: 'Wolves: choose a victim',
       options: targets,
       icon: Icons.pets,
-      color: _getColorForCharacter(SimpleWolf()),
+      color: CharacterUI.getColorForCharacter(SimpleWolf()),
       allowNone: false,
     );
 
@@ -798,7 +825,7 @@ class BlackWolf extends SimpleWolf {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     final state = actions.state;
     final lastSilenced = self.characterState['lastSilenced'] as String?;
@@ -817,7 +844,7 @@ class BlackWolf extends SimpleWolf {
       title: 'Black werewolf: choose to silence',
       options: silenceTargets,
       icon: Icons.voice_over_off,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
       allowNone: false,
     );
 
@@ -914,14 +941,14 @@ class SerialKiller extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     final target = await CharacterUI.pickPlayer(
       title: 'Serial Killer: choose to kill',
       options: options,
       icon: FontAwesomeIcons.skullCrossbones,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
     final targetPlayer = actions.state.players
         .where((p) => p.name == target)
@@ -934,6 +961,9 @@ class SerialKiller extends GameCharacter {
 class GraveRobber extends GameCharacter {
   @override
   String get name => "Grave Robber";
+
+  @override
+  int get priority => 20;
 
   @override
   Team get team => Team.solo;
@@ -956,14 +986,14 @@ class GraveRobber extends GameCharacter {
       title: self.gameCharacter.name,
       name: self.name,
       icon: self.gameCharacter.icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     final target = await CharacterUI.pickPlayer(
       title: 'Grave Robber: choose who to watch',
       options: options,
       icon: icon,
-      color: _getColorForCharacter(self.gameCharacter),
+      color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {

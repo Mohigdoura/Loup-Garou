@@ -209,8 +209,10 @@ class _DayPageState extends ConsumerState<DayPage>
       // Reveal result
       final result = eliminated.gameCharacter.team == Team.wolves
           ? 'is a wolf'
-          : eliminated.gameCharacter is Hunter
-          ? ""
+          : eliminated.gameCharacter is LittlePrince
+          ? "is the little prince"
+          : eliminated.gameCharacter is SerialKiller
+          ? "is the serial killer"
           : 'is not a wolf';
 
       await showDialog(

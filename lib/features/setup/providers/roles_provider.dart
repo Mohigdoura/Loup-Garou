@@ -112,6 +112,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
   static final _ancient = Ancient();
   static final _seer = Seer();
   static final _protector = Protector();
+  static final _healer = Healer();
   static final _villager = Villager();
   static final _simpleWolf = SimpleWolf();
   static final _whiteWolf = WhiteWolf();
@@ -133,29 +134,20 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
     _villager,
     _simpleWolf,
     _whiteWolf,
-    _witch,
-    _blackWolf,
-    _hunter,
-    _cursedChild,
-    _clown,
-    _serialKiller,
-    _avenger,
-    _littlePrince,
-    _barbie,
-    _graveRobber,
   ];
 
   final List<PaidRoleConfig> _paidRolesConfig = [
-    // PaidRoleConfig(role: _witch, price: 150),
-    // PaidRoleConfig(role: _blackWolf, price: 100),
-    // PaidRoleConfig(role: _hunter, price: 200),
-    // PaidRoleConfig(role: _cursedChild, price: 350),
-    // PaidRoleConfig(role: _clown, price: 500),
-    // PaidRoleConfig(role: _serialKiller, price: 750),
-    // PaidRoleConfig(role: _avenger, price: 350),
-    // PaidRoleConfig(role: _littlePrince, price: 750),
-    // PaidRoleConfig(role: _barbie, price: 500),
-    // PaidRoleConfig(role: _graveRobber, price: 300),
+    PaidRoleConfig(role: _witch, price: 100),
+    PaidRoleConfig(role: _healer, price: 50),
+    PaidRoleConfig(role: _blackWolf, price: 100),
+    PaidRoleConfig(role: _hunter, price: 250),
+    PaidRoleConfig(role: _cursedChild, price: 350),
+    PaidRoleConfig(role: _clown, price: 500),
+    PaidRoleConfig(role: _serialKiller, price: 750),
+    PaidRoleConfig(role: _avenger, price: 350),
+    PaidRoleConfig(role: _littlePrince, price: 750),
+    PaidRoleConfig(role: _barbie, price: 500),
+    PaidRoleConfig(role: _graveRobber, price: 500),
   ];
 
   // Much simpler!
@@ -204,6 +196,10 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
         .toList();
   }
 
+  List<String> getAllPaidRoleNames() {
+    return _paidRolesConfig.map((config) => config.role.name).toList();
+  }
+
   /// Get all purchased paid role templates
   List<GameCharacter> getPurchasedRoles() {
     final purchasedNames = ref.read(shopProvider);
@@ -215,10 +211,6 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
 
   void addRole(GameCharacter role) {
     state = [...state, role];
-  }
-
-  void shuffle() {
-    state = [...state]..shuffle();
   }
 
   void clear() {

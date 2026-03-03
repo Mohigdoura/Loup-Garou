@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loup_garou/main.dart';
+import 'package:loup_garou/models/game_character.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SHARED THEME CONSTANTS
@@ -61,6 +62,17 @@ class CharacterUI {
   static BuildContext get _ctx => navigatorKey.currentContext!;
 
   // ── 1. Wake-phase announcement ────────────────────────────────────────────
+  /// Get color for a character type
+  static Color getColorForCharacter(GameCharacter character) {
+    switch (character.team) {
+      case Team.village:
+        return Colors.blue.shade400;
+      case Team.wolves:
+        return Colors.red.shade400;
+      case Team.solo:
+        return Colors.purple.shade400;
+    }
+  }
 
   static Future<void> showWakePhase({
     required String title,
@@ -103,8 +115,27 @@ class CharacterUI {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              Text(
-                'Please wake $name and perform their action.',
+              Text.rich(
+                TextSpan(
+                  text: 'Please wake ',
+                  children: [
+                    TextSpan(
+                      text: name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        foreground: Paint()
+                          ..shader =
+                              LinearGradient(
+                                colors: [Colors.blue, color],
+                              ).createShader(
+                                const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
+                              ),
+                      ),
+                    ),
+                    const TextSpan(text: ' and perform their action.'),
+                  ],
+                ),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white.withValues(alpha: 0.8),

@@ -32,11 +32,16 @@ class GameActions {
         .read(nightContextProvider.notifier)
         .addNightEvent(player, Result.killedByWolves);
   }
-
   void addKilled(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
         .addNightEvent(player, Result.killed);
+  }
+
+  void addSeen(GamePlayer player) {
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(player, Result.seen);
   }
 
   void heal(GamePlayer player) {

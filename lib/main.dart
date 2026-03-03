@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -100,13 +101,15 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final prefs = await SharedPreferences.getInstance();
   await dotenv.load(fileName: '.env');
-
-  try {
-    MobileAds.instance.initialize();
+ if (!kDebugMode) {
+    try {
+  MobileAds.instance.initialize();
     log('initialized Google Mobile Ads successfully');
   } on Exception catch (e) {
     log('Failed to initialize Google Mobile Ads: $e');
   }
+  } 
+  
 
   runApp(
     ProviderScope(

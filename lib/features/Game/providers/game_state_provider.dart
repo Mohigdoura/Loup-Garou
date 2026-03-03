@@ -119,17 +119,11 @@ class GameStateNotifier extends Notifier<GameState> {
     );
 
     if (willDie) {
-      ref
-          .read(nightContextProvider.notifier)
-          .addNightEvent(player, Result.killed);
-
       await player.gameCharacter.onKilled(
         actions: GameActions.fromNotifier(ref, this, state),
         nightEvent: event,
       );
 
-      // ✅ Check AFTER onKilled so transformations (CursedChild) have already
-      // updated state. Now verify the player is actually dead, not transformed.
       final playerAfterKill = state.players.firstWhere(
         (p) => p.name == player.name,
       );
@@ -138,6 +132,10 @@ class GameStateNotifier extends Notifier<GameState> {
       if (actuallyDead) {
         _graveRobberCheck(player);
       }
+    } else {
+      ref
+          .read(nightContextProvider.notifier)
+          .removeNightEvent(player, Result.killed);
     }
   }
 
@@ -178,6 +176,9 @@ class GameStateNotifier extends Notifier<GameState> {
     if (watchers.isEmpty) return;
 
     final stolenRole = deadPlayer.gameCharacter;
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(deadPlayer, Result.roleStolen);
 
     // All watchers steal the role (handles multiple GraveRobbers)
     state = state.copyWith(
@@ -292,20 +293,17 @@ class GameStateNotifier extends Notifier<GameState> {
       return true;
     }
 
-    // Get all wolves and alive counts
-    final wolves = state.players
-        .where((p) => p.gameCharacter.team == Team.wolves)
+    final alivePlayers = state.alivePlayers;
+    final aliveVillagers = state.aliveVillagers;
+    final aliveWolves = state.aliveWolves;
+    final aliveKillers = alivePlayers
+        .where((element) => element.gameCharacter.name == 'Serial Killer')
         .toList();
-    final villagers = state.players
-        .where((p) => p.gameCharacter.team == Team.village)
-        .toList();
-
-    final aliveVillagers = villagers.where((p) => p.isAlive).length;
-
-    final aliveWolves = wolves.where((p) => p.isAlive).length;
 
     // Village wins if all wolves are dead
-    if (aliveWolves == 0 && wolves.isNotEmpty && aliveVillagers > 0) {
+    if (aliveWolves.isEmpty &&
+        aliveKillers.isEmpty &&
+        aliveVillagers.isNotEmpty) {
       state = state.copyWith(
         winCondition: WinCondition(
           message: 'Village wins! All wolves are dead.',
@@ -316,7 +314,9 @@ class GameStateNotifier extends Notifier<GameState> {
     }
 
     // Wolves win if they kill all villagers
-    if (aliveVillagers == 0 && aliveWolves > 0 && villagers.isNotEmpty) {
+    if (aliveVillagers.isEmpty &&
+        aliveWolves.isNotEmpty &&
+        aliveKillers.isEmpty) {
       state = state.copyWith(
         winCondition: WinCondition(
           message: 'Wolves win! They killed all the villagers.',
@@ -327,7 +327,6 @@ class GameStateNotifier extends Notifier<GameState> {
     }
 
     // Check for Serial Killer win
-    final alivePlayers = state.alivePlayers;
     if (alivePlayers.length == 1) {
       state = state.copyWith(
         winCondition: WinCondition(
