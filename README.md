@@ -1,8 +1,9 @@
 # 🐺 Loup Garou (Werewolf) - Flutter Mobile
 
-[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME)
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://play.google.com/store/apps/details?id=com.mohi.loup_garou)
 [![Framework](https://img.shields.io/badge/Framework-Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![State Management](https://img.shields.io/badge/State-Riverpod-764ABC?logo=dart&logoColor=white)](https://riverpod.dev)
+[![Download](https://img.shields.io/badge/Google_Play-Download-blue?logo=googleplay)](https://play.google.com/store/apps/details?id=com.mohi.loup_garou)
 
 A fully automated digital companion for the social deduction game **Loup Garou**. Built with Flutter, this app eliminates the need for a human moderator by handling role distribution, night actions, and voting logic programmatically.
 
@@ -16,7 +17,8 @@ A fully automated digital companion for the social deduction game **Loup Garou**
 
 ## 🛠 Tech Stack & Environment
 * **Framework:** Flutter (Dart)
-* **State Management:** Riverpod
+* **State Management:** Riverpod (Functional Reactive Programming)
+* **OS:** Developed on **Arch Linux** (KDE Plasma 6 / Wayland)
 * **IDE:** VS Code / Android Studio
 
 ## 📦 Installation & Build
@@ -31,3 +33,10 @@ flutter pub get
 
 # 3. Run the app (on connected device)
 flutter run
+```
+
+## 🔗 Download
+The app is live on the **Google Play Store**:
+[**Get it on Google Play**](https://play.google.com/store/apps/details?id=com.mohi.loup_garou)
+
+Developed by a CS Student in Tunisia 🇹🇳.
