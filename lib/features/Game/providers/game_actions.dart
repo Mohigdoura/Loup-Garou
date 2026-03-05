@@ -30,30 +30,29 @@ class GameActions {
   void addKilledByWolves(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.killedByWolves);
+        .addNightEvent(player, Result.HealedByWolves);
   }
+
   void addKilled(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.killed);
+        .addNightEvent(player, Result.Killed);
   }
 
   void addSeen(GamePlayer player) {
-    ref
-        .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.seen);
+    ref.read(nightContextProvider.notifier).addNightEvent(player, Result.Seen);
   }
 
   void heal(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.healed);
+        .addNightEvent(player, Result.Healed);
   }
 
   void addProtected(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.protected);
+        .addNightEvent(player, Result.Protected);
   }
 
   void updateCharacterState(GamePlayer player, Map<String, dynamic> updates) {
@@ -61,8 +60,8 @@ class GameActions {
   }
 
   Future<void> killPlayer(GamePlayer player) async {
-    final nightEvent = NightEvent(player, Result.killed);
-    await _notifier.killPlayer(nightEvent);
+    final nightEvent = NightEvent(player, Result.Killed);
+    _notifier.killPlayer(nightEvent);
   }
 
   void setSilenced(GamePlayer player) {
@@ -81,6 +80,10 @@ class GameActions {
 
   void littlePrinceOnVotedOut(GamePlayer player) {
     _notifier.littlePrinceOnVotedOut(player);
+  }
+
+  void princessKilled(GamePlayer player) {
+    _notifier.princessKilled(player);
   }
 
   void setWinCondition(WinCondition condition) {

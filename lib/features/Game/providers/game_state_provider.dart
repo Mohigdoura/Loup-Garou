@@ -63,7 +63,7 @@ class GameStateNotifier extends Notifier<GameState> {
   }
 
   /// Kill a player and handle their onKilled ability
-  Future<void> votePlayer(GamePlayer player) async {
+  void votePlayer(GamePlayer player) {
     // Update player's lives
     state = state.copyWith(
       players: _sortPlayers(
@@ -75,7 +75,7 @@ class GameStateNotifier extends Notifier<GameState> {
         }).toList(),
       ),
     );
-    await player.gameCharacter.onVotedOut(
+    player.gameCharacter.onVotedOut(
       actions: GameActions.fromNotifier(ref, this, state),
       self: player,
     );
@@ -102,7 +102,7 @@ class GameStateNotifier extends Notifier<GameState> {
   }
 
   /// Kill a player and handle their onKilled ability
-  Future<void> killPlayer(NightEvent event) async {
+  void killPlayer(NightEvent event) {
     final player = event.player;
     final currentPlayer = state.players.firstWhere(
       (p) => p.name == player.name,
@@ -119,7 +119,7 @@ class GameStateNotifier extends Notifier<GameState> {
     );
 
     if (willDie) {
-      await player.gameCharacter.onKilled(
+      player.gameCharacter.onKilled(
         actions: GameActions.fromNotifier(ref, this, state),
         nightEvent: event,
       );
@@ -136,7 +136,33 @@ class GameStateNotifier extends Notifier<GameState> {
       ref
           .read(nightContextProvider.notifier)
           .removeNightEvent(player, Result.killed);
+      ref
+          .read(nightContextProvider.notifier)
+          .removeNightEvent(player, Result.killedByWolves);
     }
+  }
+
+  void princessKilled(GamePlayer player) {
+    ref
+        .read(nightContextProvider.notifier)
+        .addNightEvent(player, Result.survived);
+    ref
+        .read(nightContextProvider.notifier)
+        .removeNightEvent(player, Result.killedByWolves);
+
+    state = state.copyWith(
+      players: _sortPlayers(
+        state.players.map((p) {
+          if (p.name == player.name) {
+            return p.copyWith(
+              lives: SimpleWolf().lives,
+              gameCharacter: SimpleWolf(),
+            );
+          }
+          return p;
+        }).toList(),
+      ),
+    );
   }
 
   void cursedChildKilled(GamePlayer player) {
@@ -273,7 +299,7 @@ class GameStateNotifier extends Notifier<GameState> {
 
     // Kill each player (this may trigger additional deaths like Hunter's revenge)
     for (final player in actuallyDying) {
-      await killPlayer(player);
+      killPlayer(player);
     }
     final startName = night.startName;
     final direction = night.direction;

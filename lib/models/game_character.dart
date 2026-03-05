@@ -28,11 +28,11 @@ abstract class GameCharacter {
     required GamePlayer self,
   }) async {}
 
-  Future<void> onKilled({
+  void onKilled({
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {}
-  Future<void> onVotedOut({
+  void onVotedOut({
     required GameActions actions,
     required GamePlayer self,
   }) async {}

@@ -1,14 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 
 enum Result {
-  killed,
-  healed,
-  killedByWolves,
-  transformed,
-  seen,
-  protected,
-  roleStolen,
+  Killed,
+  Healed,
+  HealedByWolves,
+  Transformed,
+  Seen,
+  Protected,
+  RoleStolen,
+  Survived,
 }
 
 class NightEvent {
@@ -47,13 +50,14 @@ class NightContextNotifier extends Notifier<NightContext> {
 
   void addNightEvent(GamePlayer player, Result result) {
     final event = NightEvent(player, result);
+    log("new night event: ${event.result} for ${event.player.name}");
     state = state.copyWith(nightEvents: [...(state.nightEvents), event]);
   }
 
   void removeNightEvent(GamePlayer player, Result result) {
     state = state.copyWith(
       nightEvents: state.nightEvents
-          .where((e) => e.player.name != player.name && e.result != result)
+          .where((e) => !(e.player.name == player.name && e.result == result))
           .toList(),
     );
   }
@@ -62,10 +66,10 @@ class NightContextNotifier extends Notifier<NightContext> {
     final results = state.nightEvents
         .where(
           (event) =>
-              event.result != Result.killedByWolves &&
-              event.result != Result.killed &&
-              event.result != Result.healed &&
-              event.result != Result.protected,
+              event.result != Result.HealedByWolves &&
+              event.result != Result.Killed &&
+              event.result != Result.Healed &&
+              event.result != Result.Protected,
         )
         .toList();
     results.addAll(actuallyDying());
@@ -74,22 +78,25 @@ class NightContextNotifier extends Notifier<NightContext> {
 
   List<NightEvent> actuallyDying() {
     List<NightEvent> killedByWolvesPlayers = state.nightEvents
-        .where((event) => event.result == Result.killedByWolves)
+        .where((event) => event.result == Result.HealedByWolves)
         .toList();
     List<NightEvent> protectedPlayers = state.nightEvents
-        .where((event) => event.result == Result.protected)
+        .where((event) => event.result == Result.Protected)
         .toList();
     List<NightEvent> healedPlayers = state.nightEvents
-        .where((event) => event.result == Result.healed)
+        .where((event) => event.result == Result.Healed)
         .toList();
+
     for (var protectedPlayer in protectedPlayers) {
       killedByWolvesPlayers.removeWhere(
         (element) => element.player.name == protectedPlayer.player.name,
       );
     }
-     List<NightEvent> killedPlayers = state.nightEvents
-        .where((event) => event.result == Result.killed)
+
+    List<NightEvent> killedPlayers = state.nightEvents
+        .where((event) => event.result == Result.Killed)
         .toList();
+
     for (var healedPlayer in healedPlayers) {
       killedByWolvesPlayers.removeWhere(
         (element) => element.player.name == healedPlayer.player.name,
@@ -98,8 +105,10 @@ class NightContextNotifier extends Notifier<NightContext> {
         (element) => element.player.name == healedPlayer.player.name,
       );
     }
+
     killedPlayers.addAll(killedByWolvesPlayers);
-    // Deduplicate by player name
+
+    // Deduplicate and unify under Result.dead
     return killedPlayers.fold<List<NightEvent>>([], (acc, e) {
       if (!acc.any((x) => x.player.name == e.player.name)) acc.add(e);
       return acc;

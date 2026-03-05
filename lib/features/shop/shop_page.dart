@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -36,10 +37,10 @@ class _ShopPageState extends ConsumerState<ShopPage> {
   @override
   Widget build(BuildContext context) {
     ref.watch(shopProvider);
-    final purchasedRoles = ref.read(rolesProvider.notifier).getPurchasedRoles();
     final unpurchasedConfigs = ref
         .read(rolesProvider.notifier)
         .getUnpurchasedRoles();
+    unpurchasedConfigs.sort((a, b) => a.price.compareTo(b.price));
 
     return Scaffold(
       body: SafeArea(
@@ -54,35 +55,6 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                   child: Column(
                     children: [
                       const SizedBox(height: 8),
-
-                      // Owned roles section
-                      if (purchasedRoles.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          'Owned Characters',
-                          Icons.check_circle,
-                        ),
-                        GridView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          cacheExtent: 200,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 1,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                              ),
-                          itemCount: purchasedRoles.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final role = purchasedRoles[index];
-                            return RepaintBoundary(
-                              child: OwnedRoleCard(role: role),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                      ],
 
                       // Available for purchase section
                       if (unpurchasedConfigs.isNotEmpty) ...[
@@ -107,8 +79,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                       ],
 
                       // Empty state
-                      if (purchasedRoles.isEmpty && unpurchasedConfigs.isEmpty)
-                        _buildEmptyState(),
+                      if (unpurchasedConfigs.isEmpty) _buildEmptyState(),
                     ],
                   ),
                 ),
@@ -749,7 +720,7 @@ class _CoinsButton extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(
                     Icons.play_circle_filled,
@@ -771,7 +742,7 @@ class _CoinsButton extends ConsumerWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'Earn 50 coins instantly',
+                          'Earn coins instantly',
                           style: TextStyle(color: Colors.white70, fontSize: 14),
                         ),
                       ],
@@ -790,6 +761,10 @@ class _CoinsButton extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              if (kDebugMode) {
+                ref.read(coinsProvider.notifier).addCoins(500);
+                return;
+              }
               final adNotifier = ref.read(adProvider.notifier);
 
               if (!adNotifier.isRewardedReady) {
@@ -816,8 +791,8 @@ class _CoinsButton extends ConsumerWidget {
               }
 
               adNotifier.showRewarded(
-                onRewardEarned: (rewardAmount) {
-                  ref.read(coinsProvider.notifier).addCoins(rewardAmount);
+                onRewardEarned: (reward) {
+                  ref.read(coinsProvider.notifier).addCoins(reward);
 
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -826,7 +801,7 @@ class _CoinsButton extends ConsumerWidget {
                           children: [
                             const Icon(Icons.celebration, color: Colors.white),
                             const SizedBox(width: 8),
-                            Text('🎉 $rewardAmount coins added!'),
+                            Text('🎉 $reward coins added!'),
                           ],
                         ),
                         backgroundColor: Colors.green,

@@ -204,7 +204,7 @@ class _DayPageState extends ConsumerState<DayPage>
     final eliminated = await _pickPlayer(candidates);
 
     if (eliminated != null && mounted) {
-      await gameStateNotifier.votePlayer(eliminated);
+      gameStateNotifier.votePlayer(eliminated);
 
       // Reveal result
       final result = eliminated.gameCharacter.team == Team.wolves

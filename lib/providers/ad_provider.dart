@@ -18,7 +18,7 @@ class AdNotifier extends Notifier<AdState> {
       'ca-app-pub-3940256099942544/1033173712';
   static const String _rewardedTestId =
       'ca-app-pub-3940256099942544/5224354917';
- 
+
   static final String _interstitialId = kDebugMode
       ? _interstitialTestId
       : dotenv.env['INTERSTITIAL_ID'] ?? _interstitialTestId;
@@ -28,7 +28,10 @@ class AdNotifier extends Notifier<AdState> {
   void loadInterstitial() {
     // Don't load if already loading or loaded
 
-    if (state.isInterstitialLoaded || state.interstitialAd != null || kDebugMode) return;
+    if (state.isInterstitialLoaded ||
+        state.interstitialAd != null ||
+        kDebugMode)
+      return;
 
     InterstitialAd.load(
       adUnitId: _interstitialId,
@@ -52,7 +55,8 @@ class AdNotifier extends Notifier<AdState> {
 
   void loadRewarded() {
     // Don't load if already loading or loaded
-    if (state.isRewardedLoaded || state.rewardedAd != null|| kDebugMode) return;
+    if (state.isRewardedLoaded || state.rewardedAd != null || kDebugMode)
+      return;
 
     RewardedAd.load(
       adUnitId: _rewardedId,
@@ -134,7 +138,7 @@ class AdNotifier extends Notifier<AdState> {
     // Show the ad and set reward callback
     ad.show(
       onUserEarnedReward: (ad, reward) {
-        onRewardEarned(50);
+        onRewardEarned(reward.amount.toInt());
 
         print('User earned reward: ${reward.amount} ${reward.type}');
       },

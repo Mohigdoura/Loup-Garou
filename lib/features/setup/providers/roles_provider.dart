@@ -112,7 +112,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
   static final _ancient = Ancient();
   static final _seer = Seer();
   static final _protector = Protector();
-  static final _healer = Healer();
+  static final _doctor = Doctor();
   static final _villager = Villager();
   static final _simpleWolf = SimpleWolf();
   static final _whiteWolf = WhiteWolf();
@@ -124,6 +124,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
   static final _serialKiller = SerialKiller();
   static final _avenger = Avenger();
   static final _littlePrince = LittlePrince();
+  static final _littlePrincess = LittlePrincess();
   static final _barbie = Barbie();
   static final _graveRobber = GraveRobber();
 
@@ -138,7 +139,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
 
   final List<PaidRoleConfig> _paidRolesConfig = [
     PaidRoleConfig(role: _witch, price: 100),
-    PaidRoleConfig(role: _healer, price: 50),
+    PaidRoleConfig(role: _doctor, price: 100),
     PaidRoleConfig(role: _blackWolf, price: 100),
     PaidRoleConfig(role: _hunter, price: 250),
     PaidRoleConfig(role: _cursedChild, price: 350),
@@ -146,6 +147,7 @@ class RolesNotifier extends Notifier<List<GameCharacter>> {
     PaidRoleConfig(role: _serialKiller, price: 750),
     PaidRoleConfig(role: _avenger, price: 350),
     PaidRoleConfig(role: _littlePrince, price: 750),
+    PaidRoleConfig(role: _littlePrincess, price: 750),
     PaidRoleConfig(role: _barbie, price: 500),
     PaidRoleConfig(role: _graveRobber, price: 500),
   ];

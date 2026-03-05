@@ -270,14 +270,15 @@ class Protector extends GameCharacter {
   }
 }
 
-class Healer extends GameCharacter {
+class Doctor extends GameCharacter {
   @override
-  String get name => "Healer";
+  String get name => "Doctor";
   @override
   Team get team => Team.village;
 
   @override
-  String get ability => 'Heals one player each night.';
+  String get ability =>
+      "Heals one player each night (like the protector but isn't limited to wolves victim).";
   @override
   IconData get icon => FontAwesomeIcons.heartCircleCheck;
   @override
@@ -568,7 +569,7 @@ class Hunter extends GameCharacter {
   String get ability => 'If killed, take the first wolf down with you.';
 
   @override
-  Future<void> onKilled({
+  void onKilled({
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {
@@ -580,7 +581,7 @@ class Hunter extends GameCharacter {
           .firstOrNull;
       if (firstWolf == null) return;
       actions.addKilled(firstWolf);
-      await actions.killPlayer(firstWolf);
+      actions.killPlayer(firstWolf);
     }
   }
 }
@@ -596,7 +597,7 @@ class Avenger extends GameCharacter {
   String get ability => 'If killed, take the next player down with you.';
 
   @override
-  Future<void> onKilled({
+  void onKilled({
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {
@@ -607,7 +608,7 @@ class Avenger extends GameCharacter {
     final nextPlayer = (thisPlayerIndex + 1) % (lastPlayer + 1);
     final nextAlivePlayer = state.players[nextPlayer];
     actions.addKilled(nextAlivePlayer);
-    await actions.killPlayer(nextAlivePlayer);
+    actions.killPlayer(nextAlivePlayer);
   }
 }
 
@@ -627,6 +628,28 @@ class LittlePrince extends GameCharacter {
     required GamePlayer self,
   }) async {
     actions.littlePrinceOnVotedOut(self);
+  }
+}
+
+class LittlePrincess extends GameCharacter {
+  @override
+  String get name => "Little Princess";
+  @override
+  Team get team => Team.village;
+  @override
+  IconData get icon => FontAwesomeIcons.crown;
+  @override
+  String get ability => "can't be killed by wolves, she always survives.";
+
+  @override
+  void onKilled({
+    required GameActions actions,
+    required NightEvent nightEvent,
+  }) {
+    if (nightEvent.result == Result.killedByWolves) {
+      actions.princessKilled(nightEvent.player);
+      return;
+    }
   }
 }
 
@@ -876,7 +899,7 @@ class CursedChild extends GameCharacter {
   @override
   String get ability => "When killed by wolves becomes one of them.";
   @override
-  Future<void> onKilled({
+  void onKilled({
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {

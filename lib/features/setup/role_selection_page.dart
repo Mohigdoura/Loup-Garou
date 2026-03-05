@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/setup/widgets/role_card.dart';
+import 'package:loup_garou/features/shop/providers/shop_provider.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
 import 'package:loup_garou/features/setup/providers/names_provider.dart';
 import 'package:loup_garou/features/setup/providers/roles_provider.dart';
@@ -74,8 +75,9 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(shopProvider); // <-- add this line
     final availableRoles = ref
-        .watch(rolesProvider.notifier)
+        .read(rolesProvider.notifier)
         .getAllAvailableRoles();
     final selection = ref.watch(roleSelectionProvider);
 
@@ -242,7 +244,65 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                     },
                   ),
                 ),
-
+                // Add this just before the bottom button Container
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: GestureDetector(
+                    onTap: () => context.push('/shop'),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFFd4af37).withValues(alpha: 0.4),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFFd4af37).withValues(alpha: 0.05),
+                            const Color(0xFF2d1b3d).withValues(alpha: 0.3),
+                          ],
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.storefront_outlined,
+                            color: const Color(
+                              0xFFd4af37,
+                            ).withValues(alpha: 0.7),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'WANT MORE ROLES? VISIT THE SHOP',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.2,
+                              color: const Color(
+                                0xFFd4af37,
+                              ).withValues(alpha: 0.7),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: const Color(
+                              0xFFd4af37,
+                            ).withValues(alpha: 0.5),
+                            size: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ), // spacing before the START GAME button
                 // Bottom button
                 Container(
                   padding: const EdgeInsets.all(20),

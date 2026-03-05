@@ -11,12 +11,15 @@ import 'package:loup_garou/features/Game/game.dart';
 import 'package:loup_garou/features/Game/give_to_narrator_page.dart';
 import 'package:loup_garou/features/Game/night/night_page.dart';
 import 'package:loup_garou/features/landing/main_menu.dart';
+import 'package:loup_garou/features/landing/patch_loading_page.dart';
 import 'package:loup_garou/features/setup/names_selection_page.dart';
 import 'package:loup_garou/features/setup/picker_page.dart'; // Ensure correct path
 import 'package:loup_garou/features/setup/role_selection_page.dart'; // Ensure correct path
 import 'package:loup_garou/features/shop/shop_page.dart';
 import 'package:loup_garou/providers/shared_prefs_provider.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 // Helper for Slide Transition
 CustomTransitionPage buildSlideTransition<T>({
@@ -101,15 +104,14 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final prefs = await SharedPreferences.getInstance();
   await dotenv.load(fileName: '.env');
- if (!kDebugMode) {
+  if (!kDebugMode) {
     try {
-  MobileAds.instance.initialize();
-    log('initialized Google Mobile Ads successfully');
-  } on Exception catch (e) {
-    log('Failed to initialize Google Mobile Ads: $e');
+      MobileAds.instance.initialize();
+      log('initialized Google Mobile Ads successfully');
+    } on Exception catch (e) {
+      log('Failed to initialize Google Mobile Ads: $e');
+    }
   }
-  } 
-  
 
   runApp(
     ProviderScope(
@@ -136,6 +138,50 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
+      // 👇 Add this builder to wrap every screen with the patch checker
+      builder: (context, child) => PatchWrapper(child: child!),
     );
+  }
+}
+
+class PatchWrapper extends StatefulWidget {
+  final Widget child;
+  const PatchWrapper({super.key, required this.child});
+
+  @override
+  State<PatchWrapper> createState() => _PatchWrapperState();
+}
+
+class _PatchWrapperState extends State<PatchWrapper> {
+  final _updater = ShorebirdUpdater();
+  bool _isPatching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForPatch();
+  }
+
+  Future<void> _checkForPatch() async {
+    try {
+      final status = await _updater.checkForUpdate();
+      if (status == UpdateStatus.outdated) {
+        setState(() => _isPatching = true);
+        await _updater.update();
+        // Small delay so user reads the message
+        await Future.delayed(const Duration(seconds: 1));
+        Restart.restartApp();
+      }
+    } catch (e) {
+      log('Patch check failed: $e');
+      // Silently fail — never block the user
+      setState(() => _isPatching = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isPatching) return const PatchLoadingScreen();
+    return widget.child;
   }
 }
