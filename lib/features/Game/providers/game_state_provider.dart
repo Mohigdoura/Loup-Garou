@@ -135,20 +135,20 @@ class GameStateNotifier extends Notifier<GameState> {
     } else {
       ref
           .read(nightContextProvider.notifier)
-          .removeNightEvent(player, Result.killed);
+          .removeNightEvent(player, Result.Killed);
       ref
           .read(nightContextProvider.notifier)
-          .removeNightEvent(player, Result.killedByWolves);
+          .removeNightEvent(player, Result.HealedByWolves);
     }
   }
 
   void princessKilled(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.survived);
+        .addNightEvent(player, Result.Survived);
     ref
         .read(nightContextProvider.notifier)
-        .removeNightEvent(player, Result.killedByWolves);
+        .removeNightEvent(player, Result.HealedByWolves);
 
     state = state.copyWith(
       players: _sortPlayers(
@@ -168,10 +168,10 @@ class GameStateNotifier extends Notifier<GameState> {
   void cursedChildKilled(GamePlayer player) {
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(player, Result.transformed);
+        .addNightEvent(player, Result.Transformed);
     ref
         .read(nightContextProvider.notifier)
-        .removeNightEvent(player, Result.killedByWolves);
+        .removeNightEvent(player, Result.HealedByWolves);
 
     state = state.copyWith(
       players: _sortPlayers(
@@ -204,7 +204,7 @@ class GameStateNotifier extends Notifier<GameState> {
     final stolenRole = deadPlayer.gameCharacter;
     ref
         .read(nightContextProvider.notifier)
-        .addNightEvent(deadPlayer, Result.roleStolen);
+        .addNightEvent(deadPlayer, Result.RoleStolen);
 
     // All watchers steal the role (handles multiple GraveRobbers)
     state = state.copyWith(

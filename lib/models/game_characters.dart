@@ -370,8 +370,8 @@ class Witch extends GameCharacter {
     final killedPlayers = night.nightEvents
         .where(
           (element) =>
-              element.result == Result.killedByWolves ||
-              element.result == Result.killed,
+              element.result == Result.HealedByWolves ||
+              element.result == Result.Killed,
         )
         .map((e) => e.player.name)
         .toList();
@@ -573,7 +573,7 @@ class Hunter extends GameCharacter {
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {
-    if (nightEvent.result == Result.killedByWolves) {
+    if (nightEvent.result == Result.HealedByWolves) {
       // Find first alive wolf
       final state = actions.state;
       final firstWolf = state.players
@@ -646,7 +646,7 @@ class LittlePrincess extends GameCharacter {
     required GameActions actions,
     required NightEvent nightEvent,
   }) {
-    if (nightEvent.result == Result.killedByWolves) {
+    if (nightEvent.result == Result.HealedByWolves) {
       actions.princessKilled(nightEvent.player);
       return;
     }
@@ -903,7 +903,7 @@ class CursedChild extends GameCharacter {
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {
-    if (nightEvent.result == Result.killedByWolves) {
+    if (nightEvent.result == Result.HealedByWolves) {
       actions.cursedChildKilled(nightEvent.player);
       return;
     }

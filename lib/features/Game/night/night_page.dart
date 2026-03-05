@@ -169,16 +169,16 @@ class _NightPageState extends ConsumerState<NightPage>
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Text(
-                                '${nightEvent.player.name} (${nightEvent.player.gameCharacter.name}) : ${nightEvent.result == Result.killed || nightEvent.result == Result.killedByWolves ? 'KILLED' : nightEvent.result.name}',
+                                '${nightEvent.player.name} (${nightEvent.player.gameCharacter.name}) : ${nightEvent.result == Result.Killed || nightEvent.result == Result.HealedByWolves ? 'KILLED' : nightEvent.result.name}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                   color:
-                                      nightEvent.result == Result.killed ||
+                                      nightEvent.result == Result.Killed ||
                                           nightEvent.result ==
-                                              Result.killedByWolves
+                                              Result.HealedByWolves
                                       ? Colors.red
-                                      : nightEvent.result == Result.transformed
+                                      : nightEvent.result == Result.Transformed
                                       ? Colors.purple
                                       : Colors.blue,
                                 ),
