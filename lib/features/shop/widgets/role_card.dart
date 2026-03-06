@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/shop/providers/coins_provider.dart';
 import 'package:loup_garou/features/shop/providers/shop_provider.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/models/game_character.dart';
 
 class RoleCard extends ConsumerWidget {
@@ -14,6 +15,7 @@ class RoleCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final coins = ref.watch(coinsProvider);
     final canAfford = coins >= price;
 
@@ -30,7 +32,7 @@ class RoleCard extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _showBuyDialog(context, ref, canAfford),
+          onTap: () => _showBuyDialog(context, ref, canAfford, l10n),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -38,7 +40,7 @@ class RoleCard extends ConsumerWidget {
               children: [
                 _buildRoleIcon(),
                 const SizedBox(width: 16),
-                Expanded(child: _buildRoleInfo()),
+                Expanded(child: _buildRoleInfo(l10n)),
                 const SizedBox(width: 12),
                 _buildBuyButton(canAfford),
               ],
@@ -71,7 +73,7 @@ class RoleCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildRoleInfo() {
+  Widget _buildRoleInfo(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -86,7 +88,7 @@ class RoleCard extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Tap to view abilities',
+          l10n.roleCardTapHint,
           style: TextStyle(
             fontSize: 12,
             color: Colors.white.withValues(alpha: 0.5),
@@ -96,7 +98,12 @@ class RoleCard extends ConsumerWidget {
     );
   }
 
-  void _showBuyDialog(BuildContext context, WidgetRef ref, bool canAfford) {
+  void _showBuyDialog(
+    BuildContext context,
+    WidgetRef ref,
+    bool canAfford,
+    AppLocalizations l10n,
+  ) {
     final teamColor = Colors.blue.shade600;
 
     showDialog(
@@ -140,9 +147,9 @@ class RoleCard extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ability',
-              style: TextStyle(
+            Text(
+              l10n.roleCardAbilityLabel,
+              style: const TextStyle(
                 color: Color(0xFFd4af37),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
@@ -161,9 +168,9 @@ class RoleCard extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFd4af37),
             ),
-            child: const Text(
-              "Close",
-              style: TextStyle(fontWeight: FontWeight.bold),
+            child: Text(
+              l10n.close,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           TextButton(
@@ -185,7 +192,7 @@ class RoleCard extends ConsumerWidget {
                                 color: Colors.white,
                               ),
                               const SizedBox(width: 8),
-                              Text('${role.name} purchased!'),
+                              Text(l10n.rolePurchased(role.name)),
                             ],
                           ),
                           backgroundColor: Colors.green,
@@ -201,9 +208,9 @@ class RoleCard extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFd4af37),
             ),
-            child: const Text(
-              "Buy",
-              style: TextStyle(fontWeight: FontWeight.bold),
+            child: Text(
+              l10n.buy,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],

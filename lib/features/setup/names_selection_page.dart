@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/setup/providers/names_provider.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 
 class NamesSelectionPage extends ConsumerStatefulWidget {
   const NamesSelectionPage({super.key});
@@ -50,9 +51,10 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
   }
 
   void _showDuplicateSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Player name already exists!'),
+        content: Text(l10n.duplicatePlayerError),
         backgroundColor: Colors.red.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -61,6 +63,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
   }
 
   void _editPlayerName(int index, String currentName) {
+    final l10n = AppLocalizations.of(context)!;
     final editController = TextEditingController(text: currentName);
     final FocusNode editFocusNode = FocusNode();
 
@@ -68,9 +71,9 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF1a1f3a),
-        title: const Text(
-          'Edit Name',
-          style: TextStyle(
+        title: Text(
+          l10n.editName,
+          style: const TextStyle(
             color: Color(0xFFd4af37),
             fontWeight: FontWeight.bold,
           ),
@@ -81,7 +84,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
           autofocus: true,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: 'Enter player name',
+            hintText: l10n.enterPlayerName,
             hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -97,9 +100,9 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white70),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: Colors.white70),
             ),
           ),
           ElevatedButton(
@@ -122,7 +125,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -150,6 +153,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final names = ref.watch(namesProvider);
     final notifier = ref.read(namesProvider.notifier);
 
@@ -185,16 +189,16 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Add Players',
-                                style: TextStyle(
+                              Text(
+                                l10n.addPlayers,
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFd4af37),
                                 ),
                               ),
                               Text(
-                                '${names.length} ${names.length == 1 ? "player" : "players"} added',
+                                l10n.playersAdded(names.length),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.white.withValues(alpha: 0.6),
@@ -243,7 +247,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
                                         fontSize: 16,
                                       ),
                                       decoration: InputDecoration(
-                                        hintText: 'Type a name…',
+                                        hintText: l10n.typeAName,
                                         hintStyle: TextStyle(
                                           color: Colors.white.withValues(
                                             alpha: 0.4,
@@ -287,7 +291,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
 
                           // Saved-list picker button
                           Tooltip(
-                            message: 'Pick from saved players',
+                            message: l10n.pickFromSavedPlayers,
                             child: GestureDetector(
                               onTap: _showSavedPlayersSheet,
                               child: Container(
@@ -340,8 +344,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  'Minimum ${5 - names.length} more '
-                                  '${5 - names.length == 1 ? "player" : "players"} needed',
+                                  l10n.minPlayersNeeded(5 - names.length),
                                   style: const TextStyle(
                                     color: Colors.orange,
                                     fontSize: 13,
@@ -367,7 +370,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'No players added yet',
+                                    l10n.noPlayersYet,
                                     style: TextStyle(
                                       color: Colors.white.withValues(
                                         alpha: 0.4,
@@ -377,7 +380,7 @@ class _NamesSelectionPageState extends ConsumerState<NamesSelectionPage>
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Type a name or tap 👥 to pick from saved players',
+                                    l10n.noPlayersHint,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.white.withValues(
@@ -468,6 +471,7 @@ class _SavedPlayersSheetState extends ConsumerState<_SavedPlayersSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final notifier = ref.read(namesProvider.notifier);
     // Re-derive on each build so removals reflect immediately
     final available = notifier.availableToAdd;
@@ -495,9 +499,9 @@ class _SavedPlayersSheetState extends ConsumerState<_SavedPlayersSheet> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Text(
-                      'Saved Players',
-                      style: TextStyle(
+                    Text(
+                      l10n.savedPlayers,
+                      style: const TextStyle(
                         color: Color(0xFFd4af37),
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -516,7 +520,7 @@ class _SavedPlayersSheetState extends ConsumerState<_SavedPlayersSheet> {
                           size: 18,
                         ),
                         label: Text(
-                          'Add ${_selected.length}',
+                          l10n.addCount(_selected.length),
                           style: const TextStyle(color: Color(0xFFd4af37)),
                         ),
                       ),
@@ -533,7 +537,7 @@ class _SavedPlayersSheetState extends ConsumerState<_SavedPlayersSheet> {
             child: available.isEmpty
                 ? Center(
                     child: Text(
-                      'All saved players are already added\nor no history yet.',
+                      l10n.allSavedAlreadyAdded,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.4),
@@ -622,9 +626,9 @@ class _SavedPlayersSheetState extends ConsumerState<_SavedPlayersSheet> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text(
-                        'Select All',
-                        style: TextStyle(color: Color(0xFFd4af37)),
+                      child: Text(
+                        l10n.selectAll,
+                        style: const TextStyle(color: Color(0xFFd4af37)),
                       ),
                     ),
                   ),
@@ -650,8 +654,8 @@ class _SavedPlayersSheetState extends ConsumerState<_SavedPlayersSheet> {
                       ),
                       child: Text(
                         _selected.isEmpty
-                            ? 'Add Selected'
-                            : 'Add ${_selected.length}',
+                            ? l10n.addSelected
+                            : l10n.addCount(_selected.length),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _selected.isEmpty
@@ -680,7 +684,7 @@ class _FastDelayedDragStartListener extends ReorderableDragStartListener {
   @override
   MultiDragGestureRecognizer createRecognizer() {
     return DelayedMultiDragGestureRecognizer(
-      delay: const Duration(milliseconds: 200), // tweak this
+      delay: const Duration(milliseconds: 200),
       debugOwner: this,
     );
   }
@@ -756,7 +760,7 @@ class _PlayerCard extends StatelessWidget {
   }
 }
 
-// ── Continue Button (unchanged) ──────────────────────────────────────────────
+// ── Continue Button ──────────────────────────────────────────────────────────
 
 class _ContinueButton extends StatelessWidget {
   final bool isEnabled;
@@ -771,6 +775,8 @@ class _ContinueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTap: isEnabled ? onPressed : null,
       child: AnimatedContainer(
@@ -801,8 +807,8 @@ class _ContinueButton extends StatelessWidget {
           children: [
             Text(
               isEnabled
-                  ? 'CONTINUE WITH $playerCount PLAYERS'
-                  : 'ADD AT LEAST 5 PLAYERS',
+                  ? l10n.continueWithPlayers(playerCount)
+                  : l10n.addAtLeast5Players,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

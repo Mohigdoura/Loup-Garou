@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/features/Game/providers/night_action_result.dart';
 
@@ -38,27 +39,19 @@ class _NightPageState extends ConsumerState<NightPage>
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final gameState = ref.read(gameStateProvider);
 
-    // Get actors sorted by priority
     final actors = _getActorsForNight(gameState);
-
-    // Show each character's wake phase and execute their actions
     await _executeNightPhases(actors);
-
-    // GameStateNotifier handles all the action resolution internally via runNight()
     await gameStateNotifier.runNight();
 
-    // Show night results
     if (mounted) {
       await _showNightResults();
     }
 
-    // Check win condition
     if (gameStateNotifier.checkWinCondition() && mounted) {
       await GameOverDialog.show(context, ref);
       return;
     }
 
-    // Proceed to day phase
     gameStateNotifier.nextDay();
   }
 
@@ -66,12 +59,10 @@ class _NightPageState extends ConsumerState<NightPage>
   List<GamePlayer> _getActorsForNight(GameState gameState) {
     final alivePlayers = gameState.players.where((p) => p.isAlive).toList();
 
-    // Get unique roles and sort by priority
     final rolesInOrder =
         alivePlayers.map((p) => p.gameCharacter).toSet().toList()
           ..sort((a, b) => a.priority.compareTo(b.priority));
 
-    // Build actor list with players for each role
     final actors = <GamePlayer>[];
     for (final role in rolesInOrder) {
       final playersWithRole = alivePlayers
@@ -85,24 +76,19 @@ class _NightPageState extends ConsumerState<NightPage>
 
   /// Show wake-up dialogs for each character type
   Future<void> _executeNightPhases(List<GamePlayer> actors) async {
-    // Track which role types have been shown (to avoid duplicate wake-ups)
     final Set<Type> shownRoles = {};
 
     for (final actor in actors) {
       final roleType = actor.gameCharacter.runtimeType;
-
-      // Skip if we already showed this role type
-      if (shownRoles.contains(roleType)) {
-        continue;
-      }
-
-      // Mark this role as shown
+      if (shownRoles.contains(roleType)) continue;
       shownRoles.add(roleType);
     }
   }
 
   /// Show night results by comparing before/after state
   Future<void> _showNightResults() async {
+    final l10n = AppLocalizations.of(context)!;
+
     List<NightEvent> nightResults = ref
         .read(nightContextProvider.notifier)
         .showNightResults();
@@ -134,9 +120,9 @@ class _NightPageState extends ConsumerState<NightPage>
                 color: Color(0xFFd4af37),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Night Results',
-                style: TextStyle(
+              Text(
+                l10n.nightResultsTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFFd4af37),
@@ -150,37 +136,33 @@ class _NightPageState extends ConsumerState<NightPage>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: nightResults.isEmpty
-                    ? const Text(
-                        'Nothing happened tonight.',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                    ? Text(
+                        l10n.nightResultsNothingHappened,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
                         textAlign: TextAlign.center,
                       )
                     : Column(
                         children: [
-                          const Text(
-                            'What happened tonight Tonight:',
-                            style: TextStyle(
+                          Text(
+                            l10n.nightResultsWhatHappened,
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 16,
                             ),
                           ),
                           const SizedBox(height: 8),
-                          for (var nightEvent in nightResults)
+                          for (final nightEvent in nightResults)
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Text(
-                                '${nightEvent.player.name} (${nightEvent.player.gameCharacter.name}) : ${nightEvent.result == Result.Killed || nightEvent.result == Result.HealedByWolves ? 'KILLED' : nightEvent.result.name}',
+                                _formatNightEvent(nightEvent, l10n),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color:
-                                      nightEvent.result == Result.Killed ||
-                                          nightEvent.result ==
-                                              Result.HealedByWolves
-                                      ? Colors.red
-                                      : nightEvent.result == Result.Transformed
-                                      ? Colors.purple
-                                      : Colors.blue,
+                                  color: _nightEventColor(nightEvent),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -198,9 +180,9 @@ class _NightPageState extends ConsumerState<NightPage>
                     vertical: 12,
                   ),
                 ),
-                child: const Text(
-                  'CONTINUE TO DAY',
-                  style: TextStyle(color: Color(0xFF0a0e27)),
+                child: Text(
+                  l10n.nightResultsContinueToDay,
+                  style: const TextStyle(color: Color(0xFF0a0e27)),
                 ),
               ),
             ],
@@ -210,8 +192,30 @@ class _NightPageState extends ConsumerState<NightPage>
     );
   }
 
+  /// Formats a [NightEvent] into a display string using localised labels.
+  String _formatNightEvent(NightEvent nightEvent, AppLocalizations l10n) {
+    final isKilled =
+        nightEvent.result == Result.Killed ||
+        nightEvent.result == Result.HealedByWolves;
+    final resultLabel = isKilled
+        ? l10n.nightResultsEventKilled
+        : nightEvent.result.name;
+    return '${nightEvent.player.name} (${nightEvent.player.gameCharacter.name}) : $resultLabel';
+  }
+
+  /// Returns the display colour for a night event row.
+  Color _nightEventColor(NightEvent nightEvent) {
+    if (nightEvent.result == Result.Killed ||
+        nightEvent.result == Result.HealedByWolves) {
+      return Colors.red;
+    }
+    if (nightEvent.result == Result.Transformed) return Colors.purple;
+    return Colors.blue;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final gameState = ref.watch(gameStateProvider);
 
     return Container(
@@ -271,7 +275,7 @@ class _NightPageState extends ConsumerState<NightPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Night ${gameState.nightCount}',
+                        l10n.nightPageTitle(gameState.nightCount),
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -279,7 +283,7 @@ class _NightPageState extends ConsumerState<NightPage>
                         ),
                       ),
                       Text(
-                        'The village sleeps...',
+                        l10n.nightPageSubtitle,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white.withValues(alpha: 0.6),
@@ -342,7 +346,8 @@ class _NightPageState extends ConsumerState<NightPage>
                         ),
                       ),
                       title: Text(
-                        p.gameCharacter.name + (p.isDead ? ' • DEAD' : ''),
+                        p.gameCharacter.name +
+                            (p.isDead ? l10n.nightPagePlayerDead : ''),
                         style: TextStyle(
                           color: p.isDead ? Colors.grey : Colors.white,
                           fontWeight: FontWeight.bold,
@@ -350,7 +355,7 @@ class _NightPageState extends ConsumerState<NightPage>
                         ),
                       ),
                       subtitle: Text(
-                        'Lives: ${p.lives}',
+                        l10n.nightPagePlayerLives(p.lives),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.6),
                         ),
@@ -393,14 +398,14 @@ class _NightPageState extends ConsumerState<NightPage>
                       ),
                     ],
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.play_arrow, color: Color(0xFF0a0e27)),
-                      SizedBox(width: 8),
+                      const Icon(Icons.play_arrow, color: Color(0xFF0a0e27)),
+                      const SizedBox(width: 8),
                       Text(
-                        'RUN NIGHT PHASE',
-                        style: TextStyle(
+                        l10n.nightPageRunNightButton,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.5,

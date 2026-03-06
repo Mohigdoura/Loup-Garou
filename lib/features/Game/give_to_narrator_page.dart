@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 
 class GiveToNarratorPage extends StatefulWidget {
   const GiveToNarratorPage({super.key});
@@ -46,6 +47,8 @@ class _GiveToNarratorPageState extends State<GiveToNarratorPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -134,7 +137,7 @@ class _GiveToNarratorPageState extends State<GiveToNarratorPage>
 
                         // Title
                         Text(
-                          'Ready to Begin',
+                          l10n.giveToNarratorTitle,
                           style: TextStyle(
                             fontSize: 42,
                             fontWeight: FontWeight.w900,
@@ -186,7 +189,7 @@ class _GiveToNarratorPageState extends State<GiveToNarratorPage>
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'Pass the phone to\nthe Narrator',
+                                l10n.giveToNarratorInstruction,
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
@@ -198,7 +201,7 @@ class _GiveToNarratorPageState extends State<GiveToNarratorPage>
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'The Narrator will guide the game\nthrough night and day phases',
+                                l10n.giveToNarratorDescription,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.white.withValues(alpha: 0.6),
@@ -247,6 +250,8 @@ class _StartGameButtonState extends State<_StartGameButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -254,9 +259,9 @@ class _StartGameButtonState extends State<_StartGameButton> {
         widget.onPressed();
       },
       onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
+      child: AnimatedScale(
         duration: const Duration(milliseconds: 150),
-        transform: Matrix4.identity()..scale(_isPressed ? 0.95 : 1.0),
+        scale: _isPressed ? 0.95 : 1.0,
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20),
@@ -283,9 +288,9 @@ class _StartGameButtonState extends State<_StartGameButton> {
                 size: 32,
               ),
               const SizedBox(width: 12),
-              const Text(
-                'START GAME',
-                style: TextStyle(
+              Text(
+                l10n.giveToNarratorStartButton,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/shop/providers/shop_provider.dart';
 import 'package:loup_garou/features/shop/widgets/role_card.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
 import 'package:loup_garou/features/shop/providers/coins_provider.dart';
 import 'package:loup_garou/features/setup/providers/roles_provider.dart';
@@ -35,6 +36,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(shopProvider);
     final unpurchasedConfigs = ref
         .read(rolesProvider.notifier)
@@ -58,7 +60,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                       // Available for purchase section
                       if (unpurchasedConfigs.isNotEmpty) ...[
                         _buildSectionHeader(
-                          'Available Characters',
+                          l10n.shopAvailableCharacters,
                           Icons.shopping_bag,
                         ),
                         ListView.builder(
@@ -91,6 +93,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -117,9 +120,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Character Shop',
-                  style: TextStyle(
+                Text(
+                  l10n.shopTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFd4af37),
@@ -127,7 +130,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                   ),
                 ),
                 Text(
-                  'Unlock new roles',
+                  l10n.shopSubtitle,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.6),
@@ -146,6 +149,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
   }
 
   void _showAdminDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final codeController = TextEditingController();
 
     showDialog(
@@ -156,13 +160,13 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: Color(0xFFd4af37), width: 2),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.lock_open, color: Color(0xFFd4af37)),
-            SizedBox(width: 12),
+            const Icon(Icons.lock_open, color: Color(0xFFd4af37)),
+            const SizedBox(width: 12),
             Text(
-              'Admin Access',
-              style: TextStyle(
+              l10n.adminAccessTitle,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -173,11 +177,11 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           controller: codeController,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: 'Enter code',
+            hintText: l10n.adminCodeHint,
             hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                color: Color(0xFFd4af37).withValues(alpha: 0.5),
+                color: const Color(0xFFd4af37).withValues(alpha: 0.5),
               ),
             ),
             focusedBorder: const OutlineInputBorder(
@@ -190,13 +194,12 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             style: TextButton.styleFrom(foregroundColor: Colors.white70),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
               final enteredCode = codeController.text.trim();
               if (enteredCode == _adminCode) {
-                // Unlock all paid roles
                 final allPaidRoleNames = ref
                     .read(rolesProvider.notifier)
                     .getAllPaidRoleNames();
@@ -206,12 +209,12 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Row(
                       children: [
-                        Icon(Icons.check_circle, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text('All roles unlocked!'),
+                        const Icon(Icons.check_circle, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(l10n.adminAllRolesUnlocked),
                       ],
                     ),
                     backgroundColor: Colors.green,
@@ -219,14 +222,13 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                   ),
                 );
               } else {
-                // Wrong code
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Row(
                       children: [
-                        Icon(Icons.error, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text('Invalid code'),
+                        const Icon(Icons.error, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(l10n.adminInvalidCode),
                       ],
                     ),
                     backgroundColor: Colors.red,
@@ -239,7 +241,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
               backgroundColor: const Color(0xFFd4af37),
               foregroundColor: Colors.black,
             ),
-            child: const Text('Submit'),
+            child: Text(l10n.submit),
           ),
         ],
       ),
@@ -275,6 +277,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(48),
       child: Column(
@@ -288,9 +291,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             child: const Icon(Icons.stars, size: 64, color: Color(0xFFd4af37)),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'All Characters Unlocked!',
-            style: TextStyle(
+          Text(
+            l10n.shopAllUnlockedTitle,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -298,7 +301,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'You own every character in the game',
+            l10n.shopAllUnlockedSubtitle,
             style: TextStyle(
               fontSize: 14,
               color: Colors.white.withValues(alpha: 0.6),
@@ -355,6 +358,7 @@ class _CoinsButton extends ConsumerWidget {
   }
 
   void _showCoinsDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -377,9 +381,9 @@ class _CoinsButton extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
-              "Earn Free Coins",
-              style: TextStyle(
+            Text(
+              l10n.earnCoinsTitle,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -397,28 +401,31 @@ class _CoinsButton extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.play_circle_filled,
                     color: Color(0xFFd4af37),
                     size: 32,
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Watch a short ad',
-                          style: TextStyle(
+                          l10n.watchAdLabel,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'Earn coins instantly',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          l10n.watchAdSubtitle,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -432,7 +439,7 @@ class _CoinsButton extends ConsumerWidget {
           TextButton(
             onPressed: () => context.pop(),
             style: TextButton.styleFrom(foregroundColor: Colors.white70),
-            child: const Text("Cancel"),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -447,11 +454,11 @@ class _CoinsButton extends ConsumerWidget {
                   context.pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Row(
+                      content: Row(
                         children: [
-                          Icon(Icons.info, color: Colors.white),
-                          SizedBox(width: 8),
-                          Text('Ad not ready yet. Please try again.'),
+                          const Icon(Icons.info, color: Colors.white),
+                          const SizedBox(width: 8),
+                          Text(l10n.adNotReady),
                         ],
                       ),
                       backgroundColor: Colors.orange,
@@ -476,7 +483,7 @@ class _CoinsButton extends ConsumerWidget {
                           children: [
                             const Icon(Icons.celebration, color: Colors.white),
                             const SizedBox(width: 8),
-                            Text('🎉 $reward coins added!'),
+                            Text(l10n.coinsAdded(reward)),
                           ],
                         ),
                         backgroundColor: Colors.green,
@@ -504,12 +511,15 @@ class _CoinsButton extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.play_arrow, size: 20),
-                SizedBox(width: 4),
-                Text("Watch Ad", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Icon(Icons.play_arrow, size: 20),
+                const SizedBox(width: 4),
+                Text(
+                  l10n.watchAdButton,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),

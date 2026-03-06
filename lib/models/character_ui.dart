@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/main.dart';
 import 'package:loup_garou/models/game_character.dart';
 
@@ -60,6 +61,7 @@ class CharacterUI {
   // ── helpers ──────────────────────────────────────────────────────────────
 
   static BuildContext get _ctx => navigatorKey.currentContext!;
+  static AppLocalizations get _l10n => AppLocalizations.of(_ctx)!;
 
   // ── 1. Wake-phase announcement ────────────────────────────────────────────
   /// Get color for a character type
@@ -83,6 +85,7 @@ class CharacterUI {
     /// Optional extra body text shown below the default message.
     String? extraMessage,
   }) async {
+    final l10n = _l10n;
     await showDialog(
       context: _ctx,
       barrierDismissible: false,
@@ -106,7 +109,7 @@ class CharacterUI {
               ),
               const SizedBox(height: 20),
               Text(
-                'Wake the $title',
+                l10n.wakePhaseTitle(title),
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -117,24 +120,15 @@ class CharacterUI {
               const SizedBox(height: 12),
               Text.rich(
                 TextSpan(
-                  text: 'Please wake ',
-                  children: [
-                    TextSpan(
-                      text: name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        foreground: Paint()
-                          ..shader =
-                              LinearGradient(
-                                colors: [Colors.blue, color],
-                              ).createShader(
-                                const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
-                              ),
-                      ),
-                    ),
-                    const TextSpan(text: ' and perform their action.'),
-                  ],
+                  // Split the localised string around the player name so we
+                  // can apply the gradient span to just the name portion.
+                  // The ARB message is: "Please wake {name} and perform their action."
+                  // We split on the name to reconstruct the three spans.
+                  children: _buildWakeMessageSpans(
+                    l10n.wakePhaseMessage(name),
+                    name,
+                    color,
+                  ),
                 ),
                 style: TextStyle(
                   fontSize: 14,
@@ -156,7 +150,7 @@ class CharacterUI {
               ],
               const SizedBox(height: 24),
               _PrimaryButton(
-                label: 'CONTINUE',
+                label: l10n.continueButton,
                 color: color,
                 onPressed: () => Navigator.pop(_ctx),
               ),
@@ -167,7 +161,36 @@ class CharacterUI {
     );
   }
 
-  // ── 2. Pick player (unchanged API, small internal refactor) ────────────────
+  /// Splits [fullMessage] on [name] to rebuild three [TextSpan]s so the name
+  /// can be rendered with its gradient style, exactly as before.
+  static List<InlineSpan> _buildWakeMessageSpans(
+    String fullMessage,
+    String name,
+    Color color,
+  ) {
+    final parts = fullMessage.split(name);
+    if (parts.length < 2) {
+      // Fallback: render plain text if the name isn't found in the string.
+      return [TextSpan(text: fullMessage)];
+    }
+    return [
+      TextSpan(text: parts.first),
+      TextSpan(
+        text: name,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          foreground: Paint()
+            ..shader = LinearGradient(
+              colors: [Colors.blue, color],
+            ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+        ),
+      ),
+      TextSpan(text: parts.sublist(1).join(name)),
+    ];
+  }
+
+  // ── 2. Pick player ────────────────────────────────────────────────────────
 
   static Future<String?> pickPlayer({
     required String title,
@@ -179,8 +202,10 @@ class CharacterUI {
     /// Optional subtitle shown under the title.
     String? subtitle,
   }) async {
+    final l10n = _l10n;
     final names = List<String>.from(options);
-    if (allowNone) names.add("None");
+    final noneLabel = l10n.noneOption;
+    if (allowNone) names.add(noneLabel);
 
     return await showDialog<String>(
       context: _ctx,
@@ -234,7 +259,7 @@ class CharacterUI {
                   itemCount: names.length,
                   itemBuilder: (context, index) {
                     final name = names[index];
-                    final isNone = name == "None";
+                    final isNone = name == noneLabel;
                     return InkWell(
                       onTap: () => Navigator.pop(_ctx, isNone ? null : name),
                       child: Container(
@@ -286,197 +311,13 @@ class CharacterUI {
     );
   }
 
-  // ── 3. Generic rich-option picker  ────────────────────────────────────────
-  ///
-  /// Use this when each option has its own icon/colour/subtitle — perfect for
-  /// day-action signals, potion selection, special choices, etc.
-  ///
-  /// Example:
-  /// ```dart
-  /// final signal = await CharacterUI.pickOption<String>(
-  ///   title: 'Barbie: choose your signal',
-  ///   icon: FontAwesomeIcons.wandMagicSparkles,
-  ///   color: Colors.pink,
-  ///   options: [
-  ///     CharacterOption(value: 'sleep', label: 'Put everyone to sleep',
-  ///         icon: Icons.bedtime, color: Colors.indigo),
-  ///     CharacterOption(value: 'kill',  label: 'Execute a player',
-  ///         icon: Icons.dangerous, color: Colors.red),
-  ///   ],
-  /// );
-  /// ```
-  static Future<T?> pickOption<T>({
-    required String title,
-    required List<CharacterOption<T>> options,
-    required IconData icon,
-    required Color color,
-    String? subtitle,
-    bool allowDismiss = false,
-  }) async {
-    return await showDialog<T>(
-      context: _ctx,
-      barrierDismissible: allowDismiss,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: const BoxConstraints(maxHeight: 520),
-          decoration: _cardDecoration(color),
-          padding: const EdgeInsets.all(_kPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(icon, color: color, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: color,
-                          ),
-                        ),
-                        if (subtitle != null)
-                          Text(
-                            subtitle,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white54,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Options
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: options.map((opt) {
-                      final c = opt.color ?? color;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: InkWell(
-                          onTap: () => Navigator.pop(_ctx, opt.value),
-                          borderRadius: BorderRadius.circular(14),
-                          child: Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: c.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: c.withValues(alpha: 0.4),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                if (opt.icon != null) ...[
-                                  Icon(opt.icon, color: c, size: 22),
-                                  const SizedBox(width: 12),
-                                ],
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        opt.label,
-                                        style: TextStyle(
-                                          color: c,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      if (opt.subtitle != null)
-                                        Text(
-                                          opt.subtitle!,
-                                          style: TextStyle(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.55,
-                                            ),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: c.withValues(alpha: 0.5),
-                                  size: 14,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              if (allowDismiss) ...[
-                const SizedBox(height: 8),
-                Center(
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(_ctx, null),
-                    child: const Text(
-                      'SKIP',
-                      style: TextStyle(color: Colors.white38),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── 4. Day-signal picker  ─────────────────────────────────────────────────
-  ///
-  /// Specialised version of [pickOption] styled for day-phase signal events.
-  /// Shows a prominent "DAY ACTION" badge. Returns the chosen signal value.
-  ///
-  /// Example (Barbie):
-  /// ```dart
-  /// final signal = await CharacterUI.pickSignal<String>(
-  ///   characterName: 'Barbie',
-  ///   characterIcon: FontAwesomeIcons.wandMagicSparkles,
-  ///   characterColor: Colors.pinkAccent,
-  ///   prompt: 'Choose your daytime signal',
-  ///   signals: [
-  ///     CharacterOption(value: 'everyone_sleep', label: 'Everyone, sleep!',
-  ///         subtitle: 'Make all players close their eyes.',
-  ///         icon: Icons.bedtime, color: Colors.indigo.shade300),
-  ///     CharacterOption(value: 'execute', label: 'I choose you!',
-  ///         subtitle: 'Secretly mark a player to kill.',
-  ///         icon: Icons.dangerous, color: Colors.red.shade400),
-  ///   ],
-  /// );
-  /// ```
   static Future<T?> pickSignal<T>({
     required String characterName,
     required IconData characterIcon,
     required Color characterColor,
     required String prompt,
   }) async {
+    final l10n = _l10n;
     return await showDialog<T>(
       context: _ctx,
       barrierDismissible: false,
@@ -507,9 +348,9 @@ class CharacterUI {
                   children: [
                     const Icon(Icons.wb_sunny, color: Colors.amber, size: 14),
                     const SizedBox(width: 6),
-                    const Text(
-                      'DAY ACTION',
-                      style: TextStyle(
+                    Text(
+                      l10n.dayActionBadge,
+                      style: const TextStyle(
                         color: Colors.amber,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -543,13 +384,15 @@ class CharacterUI {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => Navigator.pop(_ctx, null),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(color: Colors.white38, letterSpacing: 1),
+                child: Text(
+                  l10n.pickSignalDoneButton,
+                  style: const TextStyle(
+                    color: Colors.white38,
+                    letterSpacing: 1,
+                  ),
                 ),
               ),
             ],
@@ -560,19 +403,17 @@ class CharacterUI {
   }
 
   // ── 5. Result / outcome dialog  ───────────────────────────────────────────
-  ///
-  /// Show the outcome of a character's action. Used after Seer reveal, potion
-  /// use, kill confirmation, etc.
   static Future<void> showResult({
     required String title,
     required String message,
     required IconData icon,
     required Color color,
-    String buttonLabel = 'OK',
+    String? buttonLabel,
 
     /// Small tag shown above the title (e.g. "NIGHT RESULT", "DAY RESULT").
     String? tag,
   }) async {
+    final l10n = _l10n;
     await showDialog(
       context: _ctx,
       barrierDismissible: false,
@@ -607,7 +448,7 @@ class CharacterUI {
               ),
               const SizedBox(height: 24),
               _PrimaryButton(
-                label: buttonLabel,
+                label: buttonLabel ?? l10n.defaultResultButton,
                 color: color,
                 onPressed: () => Navigator.pop(_ctx),
               ),
@@ -616,96 +457,6 @@ class CharacterUI {
         ),
       ),
     );
-  }
-
-  // ── 6. Confirmation dialog  ───────────────────────────────────────────────
-  ///
-  /// Two-button confirm/cancel.  Returns `true` if confirmed.
-  ///
-  /// Example:
-  /// ```dart
-  /// final confirmed = await CharacterUI.confirm(
-  ///   title: 'Use heal potion?',
-  ///   message: 'This will save $name but you lose your heal forever.',
-  ///   icon: Icons.favorite,
-  ///   color: Colors.red,
-  ///   confirmLabel: 'HEAL',
-  /// );
-  /// ```
-  static Future<bool> confirm({
-    required String title,
-    required String message,
-    required IconData icon,
-    required Color color,
-    String confirmLabel = 'CONFIRM',
-    String cancelLabel = 'CANCEL',
-  }) async {
-    return await showDialog<bool>(
-          context: _ctx,
-          barrierDismissible: false,
-          builder: (_) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: Container(
-              decoration: _cardDecoration(color),
-              padding: const EdgeInsets.all(_kPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 48, color: color),
-                  const SizedBox(height: 16),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    message,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.75),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(_ctx, false),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            cancelLabel,
-                            style: const TextStyle(color: Colors.white54),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _PrimaryButton(
-                          label: confirmLabel,
-                          color: color,
-                          onPressed: () => Navigator.pop(_ctx, true),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ) ??
-        false;
   }
 }
 
@@ -772,109 +523,6 @@ class _TagBadge extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-}
-
-class _ToastWidget extends StatefulWidget {
-  final String message;
-  final Color color;
-  final IconData icon;
-  final VoidCallback onDone;
-  final Duration duration;
-
-  const _ToastWidget({
-    required this.message,
-    required this.color,
-    required this.icon,
-    required this.onDone,
-    required this.duration,
-  });
-
-  @override
-  State<_ToastWidget> createState() => _ToastWidgetState();
-}
-
-class _ToastWidgetState extends State<_ToastWidget>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _fade;
-  late Animation<Offset> _slide;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
-
-    _ctrl.forward();
-
-    Future.delayed(widget.duration, () async {
-      if (mounted) {
-        await _ctrl.reverse();
-        widget.onDone();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 40,
-      left: 24,
-      right: 24,
-      child: FadeTransition(
-        opacity: _fade,
-        child: SlideTransition(
-          position: _slide,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              decoration: BoxDecoration(
-                gradient: _kBgGradient,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: widget.color.withValues(alpha: 0.6),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.color.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Icon(widget.icon, color: widget.color, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      widget.message,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
     );

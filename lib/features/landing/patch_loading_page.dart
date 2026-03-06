@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 
 class PatchLoadingScreen extends StatefulWidget {
   const PatchLoadingScreen({super.key});
@@ -52,7 +53,7 @@ class _PatchLoadingScreenState extends State<PatchLoadingScreen>
             SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                backgroundColor: Colors.blueAccent.withOpacity(0.2),
+                backgroundColor: Colors.blueAccent.withValues(alpha: 0.2),
                 valueColor: const AlwaysStoppedAnimation<Color>(
                   Colors.blueAccent,
                 ),
@@ -61,9 +62,9 @@ class _PatchLoadingScreenState extends State<PatchLoadingScreen>
             const SizedBox(height: 16),
             FadeTransition(
               opacity: _fadeAnim,
-              child: const Text(
-                'Getting latest updates...',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context)!.gettingUpdates,
+                style: const TextStyle(
                   color: Colors.white54,
                   fontSize: 14,
                   letterSpacing: 1,

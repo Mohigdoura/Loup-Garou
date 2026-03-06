@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loup_garou/features/Game/models/win_condition.dart';
 import 'package:loup_garou/features/Game/providers/night_action_result.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/main.dart';
 import 'package:loup_garou/features/Game/providers/game_actions.dart';
 import 'package:loup_garou/models/character_ui.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
+
+final l10n = AppLocalizations.of(navigatorKey.currentContext!)!;
 
 class _WitchActionButton extends StatelessWidget {
   final String label;
@@ -64,7 +67,7 @@ class _WitchActionButton extends StatelessWidget {
 
 class Ancient extends GameCharacter {
   @override
-  String get name => "Ancient";
+  String get name => l10n.characterNameAncient;
 
   @override
   Team get team => Team.village;
@@ -73,8 +76,7 @@ class Ancient extends GameCharacter {
   IconData get icon => FontAwesomeIcons.scroll;
 
   @override
-  String get ability =>
-      "has two lives and if killed no one on the villagers team can use his ability and can decide who starts the talking and in which order";
+  String get ability => l10n.abilityAncient;
   @override
   int get lives => 2;
 
@@ -98,9 +100,9 @@ class Ancient extends GameCharacter {
       context: navigatorKey.currentContext!,
       builder: (_) => SimpleDialog(
         backgroundColor: const Color(0xFF1a1f3a),
-        title: const Text(
-          'Ancient: Choose who starts',
-          style: TextStyle(color: Colors.amber),
+        title: Text(
+          l10n.ancientChooseStart,
+          style: const TextStyle(color: Colors.amber),
         ),
         children: alive
             .map(
@@ -122,23 +124,23 @@ class Ancient extends GameCharacter {
       context: navigatorKey.currentContext!,
       builder: (_) => SimpleDialog(
         backgroundColor: const Color(0xFF1a1f3a),
-        title: const Text(
-          'Ancient: Choose direction',
-          style: TextStyle(color: Colors.amber),
+        title: Text(
+          l10n.ancientChooseDirection,
+          style: const TextStyle(color: Colors.amber),
         ),
         children: [
           SimpleDialogOption(
-            child: const Text(
-              'Clockwise (default)',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              l10n.directionClockwise,
+              style: const TextStyle(color: Colors.white),
             ),
             onPressed: () =>
                 Navigator.pop(navigatorKey.currentContext!, 'clockwise'),
           ),
           SimpleDialogOption(
-            child: const Text(
-              'Counter-clockwise (reverse)',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              l10n.directionCounter,
+              style: const TextStyle(color: Colors.white),
             ),
             onPressed: () =>
                 Navigator.pop(navigatorKey.currentContext!, 'counter'),
@@ -152,12 +154,12 @@ class Ancient extends GameCharacter {
 
 class Seer extends GameCharacter {
   @override
-  String get name => "Seer";
+  String get name => l10n.characterNameSeer;
   @override
   Team get team => Team.village;
 
   @override
-  String get ability => 'View one player\'s alignment each night.';
+  String get ability => l10n.abilitySeer;
   @override
   IconData get icon => FontAwesomeIcons.eye;
   @override
@@ -190,7 +192,7 @@ class Seer extends GameCharacter {
         .toList();
 
     final target = await CharacterUI.pickPlayer(
-      title: 'Seer: choose someone to see',
+      title: l10n.seerPickTitle,
       options: targets,
       icon: FontAwesomeIcons.eye,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
@@ -200,15 +202,15 @@ class Seer extends GameCharacter {
       final found = state.players.where((p) => p.name == target).firstOrNull;
       if (found == null) return;
       final isWolf = checkPlayerIfWolf(found.gameCharacter);
-      final result = isWolf ? 'is a wolf' : 'is not a wolf';
+      final verdict = isWolf ? l10n.seerIsWolf : l10n.seerIsNotWolf;
 
       await CharacterUI.showResult(
-        title: 'Seer Result',
-        message: target + ' ' + result,
+        title: l10n.seerResultTitle,
+        message: l10n.seerResult(target, verdict),
         icon: isWolf ? Icons.pets : Icons.home,
         color: isWolf ? Colors.red.shade700 : Colors.blue.shade400,
-        tag: 'NIGHT RESULT', // optional badge
-        buttonLabel: 'GOT IT', // optional override
+        tag: l10n.nightResultTag,
+        buttonLabel: l10n.gotIt,
       );
       if (isWolf) {
         actions.addSeen(found);
@@ -219,13 +221,12 @@ class Seer extends GameCharacter {
 
 class Protector extends GameCharacter {
   @override
-  String get name => "Protector";
+  String get name => l10n.characterNameProtector;
   @override
   Team get team => Team.village;
 
   @override
-  String get ability =>
-      'Protect one player from being killed by wolves each night.';
+  String get ability => l10n.abilityProtector;
   @override
   IconData get icon => FontAwesomeIcons.shield;
   @override
@@ -251,15 +252,13 @@ class Protector extends GameCharacter {
         .toList();
 
     final target = await CharacterUI.pickPlayer(
-      title: 'Protector: choose who to protect',
+      title: l10n.protectorPickTitle,
       options: targets,
       icon: FontAwesomeIcons.shield,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {
-      // ✅ Need to update the player's state in GameStateNotifier
-      // This requires adding a method to update character state
       final targetPlayer = state.players
           .where((p) => p.name == target)
           .firstOrNull;
@@ -272,13 +271,12 @@ class Protector extends GameCharacter {
 
 class Doctor extends GameCharacter {
   @override
-  String get name => "Doctor";
+  String get name => l10n.characterNameDoctor;
   @override
   Team get team => Team.village;
 
   @override
-  String get ability =>
-      "Heals one player each night (like the protector but isn't limited to wolves victim).";
+  String get ability => l10n.abilityDoctor;
   @override
   IconData get icon => FontAwesomeIcons.heartCircleCheck;
   @override
@@ -304,7 +302,7 @@ class Doctor extends GameCharacter {
         .toList();
 
     final target = await CharacterUI.pickPlayer(
-      title: 'Healer: choose who to heal',
+      title: l10n.doctorPickTitle,
       options: targets,
       icon: FontAwesomeIcons.heartCircleCheck,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
@@ -323,21 +321,21 @@ class Doctor extends GameCharacter {
 
 class Villager extends GameCharacter {
   @override
-  String get name => "Villager";
+  String get name => l10n.characterNameVillager;
 
   @override
   Team get team => Team.village;
   @override
   IconData get icon => FontAwesomeIcons.person;
   @override
-  String get ability => 'No special ability, just your vote.';
+  String get ability => l10n.abilityVillager;
 }
 
 class Witch extends GameCharacter {
   @override
-  String get name => 'Witch';
+  String get name => l10n.characterNameWitch;
   @override
-  String get ability => 'One heal potion and one kill potion per game.';
+  String get ability => l10n.abilityWitch;
 
   @override
   IconData get icon => FontAwesomeIcons.wandSparkles;
@@ -404,9 +402,9 @@ class Witch extends GameCharacter {
                   color: Colors.greenAccent,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Witch: choose action',
-                  style: TextStyle(
+                Text(
+                  l10n.witchChooseAction,
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.greenAccent,
@@ -420,7 +418,11 @@ class Witch extends GameCharacter {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Died tonight: ${killedPlayers.isNotEmpty ? killedPlayers.join(', ') : 'no one'}',
+                    l10n.witchDiedTonight(
+                      killedPlayers.isNotEmpty
+                          ? killedPlayers.join(', ')
+                          : l10n.noOne,
+                    ),
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
@@ -429,8 +431,8 @@ class Witch extends GameCharacter {
                 if (hasHeal)
                   _WitchActionButton(
                     label: tempHealTarget == null
-                        ? 'Use heal potion'
-                        : 'Change heal ($tempHealTarget)',
+                        ? l10n.witchUseHeal
+                        : l10n.witchChangeHeal(tempHealTarget),
                     icon: Icons.favorite,
                     color: Colors.red.shade400,
                     onPressed: () {
@@ -444,8 +446,8 @@ class Witch extends GameCharacter {
                 if (hasKill)
                   _WitchActionButton(
                     label: tempKillTarget == null
-                        ? 'Use kill potion'
-                        : 'Change kill ($tempKillTarget)',
+                        ? l10n.witchUseKill
+                        : l10n.witchChangeKill(tempKillTarget),
                     icon: Icons.dangerous,
                     color: Colors.purple.shade400,
                     onPressed: () =>
@@ -462,7 +464,7 @@ class Witch extends GameCharacter {
                           side: const BorderSide(color: Colors.grey),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('SKIP'),
+                        child: Text(l10n.skip),
                       ),
                     ),
                     if (tempHealTarget != null || tempKillTarget != null) ...[
@@ -477,7 +479,7 @@ class Witch extends GameCharacter {
                             backgroundColor: Colors.green.shade600,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('CONFIRM'),
+                          child: Text(l10n.confirm),
                         ),
                       ),
                     ],
@@ -493,19 +495,16 @@ class Witch extends GameCharacter {
 
       if (action == 'heal') {
         if (killedPlayers.isEmpty) {
-          // No one died tonight, nothing to heal
           continue;
         }
 
         if (killedPlayers.length == 1) {
-          // Only one option, auto-select
           tempHealTarget = killedPlayers.first;
           continue;
         }
 
-        // Let witch pick who to heal from the dead players
         final healPick = await CharacterUI.pickPlayer(
-          title: 'Witch: choose someone to heal',
+          title: l10n.witchHealPickTitle,
           options: killedPlayers,
           icon: Icons.favorite,
           color: Colors.red.shade400,
@@ -524,7 +523,7 @@ class Witch extends GameCharacter {
             .toList();
 
         final target = await CharacterUI.pickPlayer(
-          title: 'Witch: choose someone to poison',
+          title: l10n.witchKillPickTitle,
           options: choices,
           icon: Icons.dangerous,
           color: CharacterUI.getColorForCharacter(self.gameCharacter),
@@ -560,13 +559,13 @@ class Witch extends GameCharacter {
 
 class Hunter extends GameCharacter {
   @override
-  String get name => "Hunter";
+  String get name => l10n.characterNameHunter;
   @override
   Team get team => Team.village;
   @override
   IconData get icon => FontAwesomeIcons.crosshairs;
   @override
-  String get ability => 'If killed, take the first wolf down with you.';
+  String get ability => l10n.abilityHunter;
 
   @override
   void onKilled({
@@ -574,7 +573,6 @@ class Hunter extends GameCharacter {
     required NightEvent nightEvent,
   }) async {
     if (nightEvent.result == Result.HealedByWolves) {
-      // Find first alive wolf
       final state = actions.state;
       final firstWolf = state.players
           .where((p) => p.isAlive && p.gameCharacter.team == Team.wolves)
@@ -588,20 +586,19 @@ class Hunter extends GameCharacter {
 
 class Avenger extends GameCharacter {
   @override
-  String get name => "Avenger";
+  String get name => l10n.characterNameAvenger;
   @override
   Team get team => Team.village;
   @override
   IconData get icon => FontAwesomeIcons.faceAngry;
   @override
-  String get ability => 'If killed, take the next player down with you.';
+  String get ability => l10n.abilityAvenger;
 
   @override
   void onKilled({
     required GameActions actions,
     required NightEvent nightEvent,
   }) async {
-    // Find the next alive player after this player
     final state = actions.state;
     final thisPlayerIndex = state.alivePlayers.indexOf(nightEvent.player);
     final lastPlayer = state.players.length - 1;
@@ -614,13 +611,13 @@ class Avenger extends GameCharacter {
 
 class LittlePrince extends GameCharacter {
   @override
-  String get name => "Little Prince";
+  String get name => l10n.characterNameLittlePrince;
   @override
   Team get team => Team.village;
   @override
   IconData get icon => FontAwesomeIcons.crown;
   @override
-  String get ability => 'If voted out, reveals his role and stays in the game.';
+  String get ability => l10n.abilityLittlePrince;
 
   @override
   Future<void> onVotedOut({
@@ -633,13 +630,13 @@ class LittlePrince extends GameCharacter {
 
 class LittlePrincess extends GameCharacter {
   @override
-  String get name => "Little Princess";
+  String get name => l10n.characterNameLittlePrincess;
   @override
   Team get team => Team.village;
   @override
   IconData get icon => FontAwesomeIcons.crown;
   @override
-  String get ability => "can't be killed by wolves, she always survives.";
+  String get ability => l10n.abilityLittlePrincess;
 
   @override
   void onKilled({
@@ -655,7 +652,7 @@ class LittlePrincess extends GameCharacter {
 
 class Barbie extends GameCharacter {
   @override
-  String get name => "Barbie";
+  String get name => l10n.characterNameBarbie;
   @override
   Team get team => Team.village;
   @override
@@ -665,8 +662,7 @@ class Barbie extends GameCharacter {
   @override
   bool get hasDayAction => true;
   @override
-  String get ability =>
-      'can make everyone sleep during daytime and chooses who to kill.';
+  String get ability => l10n.abilityBarbie;
 
   @override
   Future<void> nightAction({
@@ -681,10 +677,10 @@ class Barbie extends GameCharacter {
         color: CharacterUI.getColorForCharacter(self.gameCharacter),
       );
       await CharacterUI.pickSignal<String>(
-        characterName: 'Barbie',
+        characterName: l10n.characterNameBarbie,
         characterIcon: FontAwesomeIcons.wandMagicSparkles,
         characterColor: Colors.pinkAccent,
-        prompt: 'Choose your daytime signal',
+        prompt: l10n.barbieChooseSignal,
       );
     }
   }
@@ -713,7 +709,7 @@ class Barbie extends GameCharacter {
         .toList();
 
     final target = await CharacterUI.pickPlayer(
-      title: 'Barbie: choose who to kill',
+      title: l10n.barbiePickTitle,
       options: targets,
       icon: self.gameCharacter.icon,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
@@ -723,25 +719,25 @@ class Barbie extends GameCharacter {
           .where((p) => p.name == target)
           .firstOrNull;
       if (targetPlayer == null) return;
-      if (targetPlayer.gameCharacter.name == 'Ancient') {
+      if (targetPlayer.gameCharacter.name == l10n.characterNameAncient) {
         await actions.killPlayer(self);
         await CharacterUI.showResult(
-          title: 'Died Today',
-          message: self.name + ' killed himself',
+          title: l10n.diedToday,
+          message: l10n.barbieSelfKill(self.name),
           icon: self.gameCharacter.icon,
           color: CharacterUI.getColorForCharacter(self.gameCharacter),
-          tag: 'Barbie RESULT', // optional badge
-          buttonLabel: 'GOT IT', // optional override
+          tag: l10n.barbieResultTag,
+          buttonLabel: l10n.gotIt,
         );
       } else {
         await actions.killPlayer(targetPlayer);
         await CharacterUI.showResult(
-          title: 'Died Today',
-          message: target + ' was killed',
+          title: l10n.diedToday,
+          message: l10n.barbieKilled(target),
           icon: self.gameCharacter.icon,
           color: CharacterUI.getColorForCharacter(self.gameCharacter),
-          tag: 'Barbie RESULT', // optional badge
-          buttonLabel: 'GOT IT', // optional override
+          tag: l10n.barbieResultTag,
+          buttonLabel: l10n.gotIt,
         );
         actions.updateCharacterState(self, {'hasBullet': false});
       }
@@ -755,7 +751,7 @@ class Barbie extends GameCharacter {
 
 class SimpleWolf extends GameCharacter {
   @override
-  String get name => "Simple Wolf";
+  String get name => l10n.characterNameSimpleWolf;
   @override
   int get priority => 100;
   @override
@@ -767,15 +763,15 @@ class SimpleWolf extends GameCharacter {
   @override
   IconData get icon => FontAwesomeIcons.paw;
   @override
-  String get ability => 'Vote to kill one player every night.';
+  String get ability => l10n.abilitySimpleWolf;
 
   Future<void> wolfsActions({
     required GameActions actions,
     required GamePlayer self,
   }) async {
     await CharacterUI.showWakePhase(
-      title: "Wolves",
-      name: "The Wolves",
+      title: l10n.wolvesWakeTitle,
+      name: l10n.wolvesWakeName,
       icon: self.gameCharacter.icon,
       color: CharacterUI.getColorForCharacter(SimpleWolf()),
     );
@@ -785,7 +781,7 @@ class SimpleWolf extends GameCharacter {
         .map((p) => p.name)
         .toList();
     final target = await CharacterUI.pickPlayer(
-      title: 'Wolves: choose a victim',
+      title: l10n.wolvesPickTitle,
       options: targets,
       icon: Icons.pets,
       color: CharacterUI.getColorForCharacter(SimpleWolf()),
@@ -804,7 +800,7 @@ class SimpleWolf extends GameCharacter {
 
 class WhiteWolf extends SimpleWolf {
   @override
-  String get name => "White Wolf";
+  String get name => l10n.characterNameWhiteWolf;
   @override
   int get priority => 100;
   @override
@@ -816,15 +812,14 @@ class WhiteWolf extends SimpleWolf {
   @override
   IconData get icon => FontAwesomeIcons.paw;
   @override
-  String get ability =>
-      "Vote to kill one player every night and can't be seen by the seer.";
+  String get ability => l10n.abilityWhiteWolf;
   @override
   bool get visibleToSeer => false;
 }
 
 class BlackWolf extends SimpleWolf {
   @override
-  String get name => "Black Wolf";
+  String get name => l10n.characterNameBlackWolf;
   @override
   int get priority => 100;
   @override
@@ -836,8 +831,7 @@ class BlackWolf extends SimpleWolf {
   @override
   IconData get icon => FontAwesomeIcons.paw;
   @override
-  String get ability =>
-      "Vote to kill one player every night and silences a player once a night.";
+  String get ability => l10n.abilityBlackWolf;
 
   @override
   Future<void> nightAction({
@@ -852,7 +846,6 @@ class BlackWolf extends SimpleWolf {
     );
     final state = actions.state;
     final lastSilenced = self.characterState['lastSilenced'] as String?;
-    // First, silence a player
     final silenceTargets = state.players
         .where(
           (p) =>
@@ -864,7 +857,7 @@ class BlackWolf extends SimpleWolf {
         .toList();
 
     final silenceTarget = await CharacterUI.pickPlayer(
-      title: 'Black werewolf: choose to silence',
+      title: l10n.blackWolfPickTitle,
       options: silenceTargets,
       icon: Icons.voice_over_off,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
@@ -886,7 +879,7 @@ class BlackWolf extends SimpleWolf {
 
 class CursedChild extends GameCharacter {
   @override
-  String get name => "Cursed Child";
+  String get name => l10n.characterNameCursedChild;
 
   @override
   String? get image => 'assets/wolf.png';
@@ -897,7 +890,8 @@ class CursedChild extends GameCharacter {
   @override
   IconData get icon => FontAwesomeIcons.paw;
   @override
-  String get ability => "When killed by wolves becomes one of them.";
+  String get ability => l10n.abilityCursedChild;
+
   @override
   void onKilled({
     required GameActions actions,
@@ -916,14 +910,15 @@ class CursedChild extends GameCharacter {
 
 class Clown extends GameCharacter {
   @override
-  String get name => "Clown";
+  String get name => l10n.characterNameClown;
 
   @override
   Team get team => Team.solo;
   @override
   IconData get icon => FontAwesomeIcons.faceGrinTongueWink;
   @override
-  String get ability => "When voted out wins.";
+  String get ability => l10n.abilityClown;
+
   @override
   Future<void> onVotedOut({
     required GameActions actions,
@@ -937,7 +932,7 @@ class Clown extends GameCharacter {
 
 class SerialKiller extends GameCharacter {
   @override
-  String get name => "Serial Killer";
+  String get name => l10n.characterNameSerialKiller;
   @override
   int get priority => 70;
   @override
@@ -945,8 +940,8 @@ class SerialKiller extends GameCharacter {
   @override
   IconData get icon => FontAwesomeIcons.skull;
   @override
-  String get ability =>
-      "Each night you kill another player. If you are the last player alive you win";
+  String get ability => l10n.abilitySerialKiller;
+
   @override
   Future<void> nightAction({
     required GameActions actions,
@@ -964,7 +959,7 @@ class SerialKiller extends GameCharacter {
     );
 
     final target = await CharacterUI.pickPlayer(
-      title: 'Serial Killer: choose to kill',
+      title: l10n.serialKillerPickTitle,
       options: options,
       icon: FontAwesomeIcons.skullCrossbones,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
@@ -979,7 +974,7 @@ class SerialKiller extends GameCharacter {
 
 class GraveRobber extends GameCharacter {
   @override
-  String get name => "Grave Robber";
+  String get name => l10n.characterNameGraveRobber;
 
   @override
   int get priority => 20;
@@ -989,8 +984,8 @@ class GraveRobber extends GameCharacter {
   @override
   IconData get icon => FontAwesomeIcons.breadSlice;
   @override
-  String get ability =>
-      "Can choose a player each night, if that player dies he takes his role.";
+  String get ability => l10n.abilityGraveRobber;
+
   @override
   Future<void> nightAction({
     required GameActions actions,
@@ -1009,14 +1004,13 @@ class GraveRobber extends GameCharacter {
     );
 
     final target = await CharacterUI.pickPlayer(
-      title: 'Grave Robber: choose who to watch',
+      title: l10n.graveRobberPickTitle,
       options: options,
       icon: icon,
       color: CharacterUI.getColorForCharacter(self.gameCharacter),
     );
 
     if (target != null) {
-      // Save target so _finalizeNight can check it
       actions.updateCharacterState(self, {'watchingTarget': target});
     }
   }

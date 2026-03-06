@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
 
 class MainMenu extends ConsumerStatefulWidget {
@@ -20,6 +21,8 @@ class _MainMenuState extends ConsumerState<MainMenu> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -36,7 +39,6 @@ class _MainMenuState extends ConsumerState<MainMenu> {
           ),
           child: Stack(
             children: [
-              // Animated background stars
               ...List.generate(30, (index) {
                 return Positioned(
                   left: (index * 37) % MediaQuery.of(context).size.width,
@@ -58,14 +60,12 @@ class _MainMenuState extends ConsumerState<MainMenu> {
                   ),
                 );
               }),
-              // Main content
               SafeArea(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Spacer(flex: 2),
 
-                    // Moon icon
                     Container(
                       width: 120,
                       height: 120,
@@ -92,9 +92,8 @@ class _MainMenuState extends ConsumerState<MainMenu> {
 
                     const SizedBox(height: 40),
 
-                    // Title
                     Text(
-                      'LOUP GAROU',
+                      l10n.appTitle,
                       style: TextStyle(
                         fontSize: 56,
                         fontWeight: FontWeight.w900,
@@ -118,7 +117,7 @@ class _MainMenuState extends ConsumerState<MainMenu> {
                     const SizedBox(height: 8),
 
                     Text(
-                      'The Werewolf Game',
+                      l10n.appSubtitle,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w300,
@@ -132,11 +131,9 @@ class _MainMenuState extends ConsumerState<MainMenu> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: _MenuButton(
-                        label: 'New Game',
+                        label: l10n.menuNewGame,
                         icon: Icons.play_arrow_rounded,
-                        onPressed: () {
-                          context.push('/name-selection');
-                        },
+                        onPressed: () => context.push('/name-selection'),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -144,11 +141,9 @@ class _MainMenuState extends ConsumerState<MainMenu> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: _MenuButton(
-                        label: 'Shop',
+                        label: l10n.menuShop,
                         icon: Icons.shopping_cart_outlined,
-                        onPressed: () {
-                          context.push('/shop');
-                        },
+                        onPressed: () => context.push('/shop'),
                       ),
                     ),
 
@@ -157,12 +152,21 @@ class _MainMenuState extends ConsumerState<MainMenu> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: _MenuButton(
-                        label: 'RULES',
+                        label: l10n.settings,
+                        icon: Icons.settings,
+                        onPressed: () => context.push('/settings'),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: _MenuButton(
+                        label: l10n.menuRules,
                         icon: Icons.menu_book_rounded,
                         isSecondary: true,
-                        onPressed: () {
-                          _showRulesDialog(context);
-                        },
+                        onPressed: () => _showRulesDialog(context),
                       ),
                     ),
 
@@ -178,6 +182,8 @@ class _MainMenuState extends ConsumerState<MainMenu> {
   }
 
   void _showRulesDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -188,32 +194,16 @@ class _MainMenuState extends ConsumerState<MainMenu> {
             color: const Color(0xFFd4af37).withValues(alpha: 0.3),
           ),
         ),
-        title: const Text(
-          'How to Play',
-          style: TextStyle(
+        title: Text(
+          l10n.rulesTitle,
+          style: const TextStyle(
             color: Color(0xFFd4af37),
             fontWeight: FontWeight.bold,
           ),
         ),
         content: SingleChildScrollView(
           child: Text(
-            '🌙 OBJECTIVE\n'
-            'Village team: Eliminate all werewolves\n'
-            'Werewolf team: Kill all villagers\n\n'
-            '🌓 GAME FLOW\n'
-            '1. Night Phase: Special roles act\n'
-            '2. Day Phase: Discuss and vote\n'
-            '3. Repeat until one team wins\n\n'
-            '🐺 ROLES\n'
-            'Werewolf: Kills villagers at night\n'
-            'Seer: Sees one player\'s alignment\n'
-            'Protector: Guards one player\n'
-            'Witch: One heal, one poison\n'
-            'Hunter: Kills a wolf when eliminated\n'
-            'Ancient: 2 lives, sets talking order\n'
-            '............................................\n'
-            'And a lot more roles you unlock in the shop!\n\n',
-
+            l10n.rulesContent,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.9),
               height: 1.6,
@@ -223,9 +213,9 @@ class _MainMenuState extends ConsumerState<MainMenu> {
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text(
-              'GOT IT',
-              style: TextStyle(color: Color(0xFFd4af37)),
+            child: Text(
+              l10n.rulesGotIt,
+              style: const TextStyle(color: Color(0xFFd4af37)),
             ),
           ),
         ],
@@ -233,6 +223,8 @@ class _MainMenuState extends ConsumerState<MainMenu> {
     );
   }
 }
+
+// _MenuButton and _MenuButtonState remain unchanged
 
 class _MenuButton extends StatefulWidget {
   final String label;

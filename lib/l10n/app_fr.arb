@@ -1,0 +1,794 @@
+{
+  "@@locale": "fr",
+  "appTitle": "LOUP GAROU",
+  "@appTitle": {
+    "description": "Main title of the app displayed on the home screen"
+  },
+  "settings": "Paramètres",
+  "@settings": {
+    "description": "the word settings for settings"
+  },
+  "appSubtitle": "Le Jeu des Loups",
+  "@appSubtitle": {
+    "description": "Subtitle displayed under the main title"
+  },
+  "menuNewGame": "Nouvelle Partie",
+  "@menuNewGame": {
+    "description": "Label for the New Game button on the main menu"
+  },
+  "menuShop": "Boutique",
+  "@menuShop": {
+    "description": "Label for the Shop button on the main menu"
+  },
+  "menuRules": "RÈGLES",
+  "@menuRules": {
+    "description": "Label for the Rules button on the main menu"
+  },
+  "rulesTitle": "Comment Jouer",
+  "@rulesTitle": {
+    "description": "Title of the rules dialog"
+  },
+  "rulesContent": "🌙 OBJECTIF\nVillageois : Éliminez tous les loups\nLoups : Tuez tous les villageois\n\n🌓 DÉROULEMENT\n1. Phase Nuit : Les rôles spéciaux agissent\n2. Phase Jour : Débattez et votez\n3. Répétez jusqu'à la victoire d'une équipe\n\n🐺 RÔLES\nLoup : Tue les villageois la nuit\nVoyante : Voit l'alignement d'un joueur\nProtecteur : Protège un joueur\nSorcière : Un soin, un poison\nChasseur : Tue un loup à sa mort\nAncien : 2 vies, fixe l'ordre de parole\n............................................\nEt bien d'autres rôles à débloquer !\n\n",
+  "@rulesContent": {
+    "description": "Full rules text displayed in the How to Play dialog"
+  },
+  "rulesGotIt": "COMPRIS",
+  "@rulesGotIt": {
+    "description": "Dismiss button label in the rules dialog"
+  },
+  "gotIt": "COMPRIS",
+  "@gotIt": {
+    "description": "Generic dismiss button label"
+  },
+  "skip": "PASSER",
+  "@skip": {
+    "description": "Generic skip button label"
+  },
+  "confirm": "CONFIRMER",
+  "@confirm": {
+    "description": "Generic confirm button label"
+  },
+  "noOne": "personne",
+  "@noOne": {
+    "description": "Displayed when no player was killed tonight"
+  },
+  "nightResultTag": "RÉSULTAT NUIT",
+  "@nightResultTag": {
+    "description": "Badge shown on night result dialogs"
+  },
+  "diedToday": "Mort Aujourd'hui",
+  "@diedToday": {
+    "description": "Title for daytime kill result dialog"
+  },
+  "ancientChooseStart": "Ancien : Choisir qui commence",
+  "@ancientChooseStart": {
+    "description": "Dialog title for Ancient choosing the starting player"
+  },
+  "ancientChooseDirection": "Ancien : Choisir la direction",
+  "@ancientChooseDirection": {
+    "description": "Dialog title for Ancient choosing talking direction"
+  },
+  "directionClockwise": "Sens horaire (défaut)",
+  "@directionClockwise": {
+    "description": "Clockwise direction option"
+  },
+  "directionCounter": "Sens anti-horaire (inverse)",
+  "@directionCounter": {
+    "description": "Counter-clockwise direction option"
+  },
+  "seerPickTitle": "Voyante : choisir un joueur à voir",
+  "@seerPickTitle": {
+    "description": "Title when Seer picks a player to inspect"
+  },
+  "seerResultTitle": "Résultat Voyante",
+  "@seerResultTitle": {
+    "description": "Title of the Seer result dialog"
+  },
+  "seerResult": "{player} {verdict}",
+  "@seerResult": {
+    "description": "Seer result message e.g. 'John est un loup'",
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "verdict": {
+        "type": "String"
+      }
+    }
+  },
+  "seerIsWolf": "est un loup",
+  "@seerIsWolf": {
+    "description": "Verdict when the inspected player is a wolf"
+  },
+  "seerIsNotWolf": "n'est pas un loup",
+  "@seerIsNotWolf": {
+    "description": "Verdict when the inspected player is not a wolf"
+  },
+  "protectorPickTitle": "Protecteur : choisir qui protéger",
+  "@protectorPickTitle": {
+    "description": "Title when Protector picks a player to protect"
+  },
+  "doctorPickTitle": "Guérisseur : choisir qui soigner",
+  "@doctorPickTitle": {
+    "description": "Title when Doctor picks a player to heal"
+  },
+  "witchChooseAction": "Sorcière : choisir une action",
+  "@witchChooseAction": {
+    "description": "Title of the Witch action dialog"
+  },
+  "witchDiedTonight": "Mort cette nuit : {names}",
+  "@witchDiedTonight": {
+    "description": "Shows who died tonight in the Witch dialog",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "witchUseHeal": "Utiliser la potion de soin",
+  "@witchUseHeal": {
+    "description": "Witch button: use the heal potion"
+  },
+  "witchChangeHeal": "Changer le soin ({target})",
+  "@witchChangeHeal": {
+    "description": "Witch button: change the current heal target",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "witchUseKill": "Utiliser la potion de mort",
+  "@witchUseKill": {
+    "description": "Witch button: use the kill potion"
+  },
+  "witchChangeKill": "Changer la cible ({target})",
+  "@witchChangeKill": {
+    "description": "Witch button: change the current kill target",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "witchHealPickTitle": "Sorcière : choisir qui soigner",
+  "@witchHealPickTitle": {
+    "description": "Title when Witch picks a player to heal"
+  },
+  "witchKillPickTitle": "Sorcière : choisir qui empoisonner",
+  "@witchKillPickTitle": {
+    "description": "Title when Witch picks a player to poison"
+  },
+  "barbieChooseSignal": "Choisissez votre signal de jour",
+  "@barbieChooseSignal": {
+    "description": "Prompt for Barbie choosing her signal on night 1"
+  },
+  "barbiePickTitle": "Barbie : choisir qui tuer",
+  "@barbiePickTitle": {
+    "description": "Title when Barbie picks a daytime kill target"
+  },
+  "barbieSelfKill": "{name} s'est suicidé",
+  "@barbieSelfKill": {
+    "description": "Message shown when Barbie kills herself by targeting the Ancient",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "barbieKilled": "{name} a été tué",
+  "@barbieKilled": {
+    "description": "Message shown when Barbie kills a player",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "barbieResultTag": "RÉSULTAT Barbie",
+  "@barbieResultTag": {
+    "description": "Badge on Barbie's result dialog"
+  },
+  "wolvesWakeTitle": "Loups",
+  "@wolvesWakeTitle": {
+    "description": "Wake phase title for the wolf team"
+  },
+  "wolvesWakeName": "Les Loups",
+  "@wolvesWakeName": {
+    "description": "Wake phase display name for the wolf team"
+  },
+  "wolvesPickTitle": "Loups : choisir une victime",
+  "@wolvesPickTitle": {
+    "description": "Title when wolves pick a nightly victim"
+  },
+  "blackWolfPickTitle": "Loup Noir : choisir qui réduire au silence",
+  "@blackWolfPickTitle": {
+    "description": "Title when Black Wolf picks a player to silence"
+  },
+  "serialKillerPickTitle": "Tueur en Série : choisir qui tuer",
+  "@serialKillerPickTitle": {
+    "description": "Title when Serial Killer picks a nightly victim"
+  },
+  "graveRobberPickTitle": "Fossoyeur : choisir qui surveiller",
+  "@graveRobberPickTitle": {
+    "description": "Title when Grave Robber picks a player to watch"
+  },
+  "characterNameAncient": "Ancien",
+  "characterNameSeer": "Voyante",
+  "characterNameProtector": "Protecteur",
+  "characterNameDoctor": "Guérisseur",
+  "characterNameVillager": "Villageois",
+  "characterNameWitch": "Sorcière",
+  "characterNameHunter": "Chasseur",
+  "characterNameAvenger": "Vengeur",
+  "characterNameLittlePrince": "Petit Prince",
+  "characterNameLittlePrincess": "Petite Princesse",
+  "characterNameBarbie": "Barbie",
+  "characterNameSimpleWolf": "Loup Simple",
+  "characterNameWhiteWolf": "Loup Blanc",
+  "characterNameBlackWolf": "Loup Noir",
+  "characterNameCursedChild": "Enfant Maudit",
+  "characterNameClown": "Clown",
+  "characterNameSerialKiller": "Tueur en Série",
+  "characterNameGraveRobber": "Fossoyeur",
+  "abilityAncient": "a deux vies et si tué, les villageois perdent leurs capacités ; il décide qui parle en premier et dans quel ordre.",
+  "abilitySeer": "Voit l'alignement d'un joueur chaque nuit.",
+  "abilityProtector": "Protège un joueur des loups chaque nuit.",
+  "abilityDoctor": "Soigne un joueur chaque nuit (comme le protecteur mais pas limité aux victimes des loups).",
+  "abilityVillager": "Aucune capacité spéciale, juste votre vote.",
+  "abilityWitch": "Une potion de soin et une potion de mort par partie.",
+  "abilityHunter": "Si tué, emporte le premier loup avec lui.",
+  "abilityAvenger": "Si tué, emporte le prochain joueur avec lui.",
+  "abilityLittlePrince": "Si éliminé par vote, révèle son rôle et reste en jeu.",
+  "abilityLittlePrincess": "ne peut pas être tuée par les loups, elle survit toujours.",
+  "abilityBarbie": "peut endormir tout le monde de jour et choisit qui tuer.",
+  "abilitySimpleWolf": "Vote pour tuer un joueur chaque nuit.",
+  "abilityWhiteWolf": "Vote pour tuer un joueur chaque nuit et est invisible à la voyante.",
+  "abilityBlackWolf": "Vote pour tuer chaque nuit et réduit un joueur au silence une fois par nuit.",
+  "abilityCursedChild": "S'il est tué par les loups, il rejoint leur camp.",
+  "abilityClown": "S'il est éliminé par vote, il gagne la partie.",
+  "abilitySerialKiller": "Tue un joueur chaque nuit. S'il est le dernier survivant, il gagne.",
+  "abilityGraveRobber": "Surveille un joueur chaque nuit ; s'il meurt, il prend son rôle.",
+  "wakePhaseTitle": "Réveillez le {title}",
+  "@wakePhaseTitle": {
+    "description": "Title shown in the wake phase dialog",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "wakePhaseMessage": "Réveillez {name} et effectuez son action.",
+  "@wakePhaseMessage": {
+    "description": "Body message in the wake phase dialog",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "continueButton": "CONTINUER",
+  "@continueButton": {
+    "description": "Label for the continue button"
+  },
+  "noneOption": "Aucun",
+  "@noneOption": {
+    "description": "Option representing no selection in a picker list"
+  },
+  "dayActionBadge": "ACTION DE JOUR",
+  "@dayActionBadge": {
+    "description": "Badge label shown on day-action dialogs"
+  },
+  "pickSignalDoneButton": "Terminé",
+  "@pickSignalDoneButton": {
+    "description": "Done button label in the signal picker dialog"
+  },
+  "defaultResultButton": "OK",
+  "@defaultResultButton": {
+    "description": "Default label for the result dialog confirm button"
+  },
+  "nightResultsTitle": "Résultats de la Nuit",
+  "@nightResultsTitle": {
+    "description": "Title of the night results dialog"
+  },
+  "nightResultsNothingHappened": "Rien ne s'est passé cette nuit.",
+  "@nightResultsNothingHappened": {
+    "description": "Shown in the night results dialog when no events occurred"
+  },
+  "nightResultsWhatHappened": "Ce qui s'est passé cette nuit :",
+  "@nightResultsWhatHappened": {
+    "description": "Subtitle in the night results dialog listing events"
+  },
+  "nightResultsEventKilled": "TUÉS",
+  "@nightResultsEventKilled": {
+    "description": "Result label shown when a player was killed during the night"
+  },
+  "nightResultsContinueToDay": "PASSER AU JOUR",
+  "@nightResultsContinueToDay": {
+    "description": "Button label to proceed from night results to the day phase"
+  },
+  "nightPageTitle": "Nuit {count}",
+  "@nightPageTitle": {
+    "description": "Header title on the night page",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nightPageSubtitle": "Le village s'endort...",
+  "@nightPageSubtitle": {
+    "description": "Subtitle shown under the night count in the header"
+  },
+  "nightPagePlayerDead": " • MORT",
+  "@nightPagePlayerDead": {
+    "description": "Suffix appended to a player's role name when they are dead"
+  },
+  "nightPagePlayerLives": "Vies : {count}",
+  "@nightPagePlayerLives": {
+    "description": "Player lives indicator in the player list",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nightPageRunNightButton": "LANCER LA PHASE NUIT",
+  "@nightPageRunNightButton": {
+    "description": "Label for the button that starts the night phase"
+  },
+  "voteDialogTitle": "Vote : Choisir qui éliminer",
+  "@voteDialogTitle": {
+    "description": "Title of the vote dialog where players pick someone to eliminate"
+  },
+  "voteSkipTie": "Passer / Égalité - Pas d'élimination",
+  "@voteSkipTie": {
+    "description": "Option in the vote dialog to skip or declare a tie"
+  },
+  "voteResultTitle": "Résultat du Vote",
+  "@voteResultTitle": {
+    "description": "Title of the dialog shown after a vote"
+  },
+  "voteResultMessage": "{playerName} {result}",
+  "@voteResultMessage": {
+    "description": "Body of the vote result dialog",
+    "placeholders": {
+      "playerName": {
+        "type": "String",
+        "description": "The eliminated player's name"
+      },
+      "result": {
+        "type": "String",
+        "description": "The role reveal string"
+      }
+    }
+  },
+  "voteResultIsWolf": "est un loup",
+  "@voteResultIsWolf": {
+    "description": "Role reveal when the eliminated player is a wolf"
+  },
+  "voteResultIsLittlePrince": "est le petit prince",
+  "@voteResultIsLittlePrince": {
+    "description": "Role reveal when the eliminated player is the Little Prince"
+  },
+  "voteResultIsSerialKiller": "est le tueur en série",
+  "@voteResultIsSerialKiller": {
+    "description": "Role reveal when the eliminated player is the Serial Killer"
+  },
+  "voteResultNotWolf": "n'est pas un loup",
+  "@voteResultNotWolf": {
+    "description": "Role reveal when the eliminated player is an innocent villager"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "Generic confirmation button label"
+  },
+  "dayTitle": "Jour {dayNumber}",
+  "@dayTitle": {
+    "description": "Header showing the current day number",
+    "placeholders": {
+      "dayNumber": {
+        "type": "int",
+        "description": "The current day/night count"
+      }
+    }
+  },
+  "daySubtitle": "Place au débat",
+  "@daySubtitle": {
+    "description": "Subtitle shown under the day header"
+  },
+  "talkingOrder": "Ordre de Parole",
+  "@talkingOrder": {
+    "description": "Section header for the list of players in speaking order"
+  },
+  "playerStatusDead": "{characterName} • MORT",
+  "@playerStatusDead": {
+    "description": "Player status subtitle when the player is dead",
+    "placeholders": {
+      "characterName": {
+        "type": "String",
+        "description": "The character's role name"
+      }
+    }
+  },
+  "playerStatusSilenced": "{characterName} • RÉDUIT AU SILENCE",
+  "@playerStatusSilenced": {
+    "description": "Player status subtitle when the player is silenced",
+    "placeholders": {
+      "characterName": {
+        "type": "String",
+        "description": "The character's role name"
+      }
+    }
+  },
+  "dayAbilityTooltip": "Capacité de Jour",
+  "@dayAbilityTooltip": {
+    "description": "Tooltip for the day ability icon button on a player tile"
+  },
+  "voteToEliminate": "VOTER POUR ÉLIMINER",
+  "@voteToEliminate": {
+    "description": "Label on the main vote button"
+  },
+  "skipVote": "PASSER LE VOTE",
+  "@skipVote": {
+    "description": "Label on the skip vote button"
+  },
+  "shopTitle": "Boutique des Rôles",
+  "@shopTitle": {
+    "description": "Title shown in the shop page header"
+  },
+  "shopSubtitle": "Débloquez de nouveaux rôles",
+  "@shopSubtitle": {
+    "description": "Subtitle shown under the shop page header"
+  },
+  "shopAvailableCharacters": "Personnages Disponibles",
+  "@shopAvailableCharacters": {
+    "description": "Section header for the list of purchasable characters"
+  },
+  "shopAllUnlockedTitle": "Tous les Personnages Débloqués !",
+  "@shopAllUnlockedTitle": {
+    "description": "Empty state title when every character has been purchased"
+  },
+  "shopAllUnlockedSubtitle": "Vous possédez tous les personnages",
+  "@shopAllUnlockedSubtitle": {
+    "description": "Empty state subtitle when every character has been purchased"
+  },
+  "adminAccessTitle": "Accès Admin",
+  "@adminAccessTitle": {
+    "description": "Title of the admin code dialog"
+  },
+  "adminCodeHint": "Entrez le code",
+  "@adminCodeHint": {
+    "description": "Hint text for the admin code input field"
+  },
+  "adminAllRolesUnlocked": "Tous les rôles débloqués !",
+  "@adminAllRolesUnlocked": {
+    "description": "Snackbar message shown after successfully using the admin code"
+  },
+  "adminInvalidCode": "Code invalide",
+  "@adminInvalidCode": {
+    "description": "Snackbar message shown when the admin code is wrong"
+  },
+  "cancel": "Annuler",
+  "@cancel": {
+    "description": "Generic cancel button label"
+  },
+  "submit": "Valider",
+  "@submit": {
+    "description": "Generic submit button label"
+  },
+  "earnCoinsTitle": "Gagner des Pièces",
+  "@earnCoinsTitle": {
+    "description": "Title of the earn coins dialog"
+  },
+  "watchAdLabel": "Regarder une courte pub",
+  "@watchAdLabel": {
+    "description": "Primary label in the watch-ad option tile"
+  },
+  "watchAdSubtitle": "Gagnez des pièces instantanément",
+  "@watchAdSubtitle": {
+    "description": "Secondary description in the watch-ad option tile"
+  },
+  "watchAdButton": "Voir la pub",
+  "@watchAdButton": {
+    "description": "Label on the Watch Ad confirmation button"
+  },
+  "adNotReady": "Pub non disponible. Réessayez plus tard.",
+  "@adNotReady": {
+    "description": "Snackbar message shown when the rewarded ad has not loaded yet"
+  },
+  "coinsAdded": "🎉 {amount} pièces ajoutées !",
+  "@coinsAdded": {
+    "description": "Snackbar message shown after earning coins from a rewarded ad",
+    "placeholders": {
+      "amount": {
+        "type": "int",
+        "description": "The number of coins rewarded"
+      }
+    }
+  },
+  "gameOverTitle": "Partie Terminée",
+  "@gameOverTitle": {
+    "description": "Title of the game over dialog"
+  },
+  "gameOverWinner": "Le gagnant est : {name}",
+  "@gameOverWinner": {
+    "description": "Game over message when there is exactly one winner",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "description": "The single winner's name"
+      }
+    }
+  },
+  "gameOverWinners": "Les gagnants sont : {names}",
+  "@gameOverWinners": {
+    "description": "Game over message when there are multiple winners",
+    "placeholders": {
+      "names": {
+        "type": "String",
+        "description": "Comma-separated list of winner names"
+      }
+    }
+  },
+  "backToMenu": "RETOUR AU MENU",
+  "@backToMenu": {
+    "description": "Button label to return to the main menu from the game over dialog"
+  },
+  "roleCardTapHint": "Appuyez pour voir les capacités",
+  "@roleCardTapHint": {
+    "description": "Hint text shown under the role name on the role card"
+  },
+  "gettingUpdates": "Récupération des mises à jour...",
+  "@gettingUpdates": {
+    "description": "Getting latest update for patching"
+  },
+  "roleCardAbilityLabel": "Capacité",
+  "@roleCardAbilityLabel": {
+    "description": "Section label above the role ability description in the buy dialog"
+  },
+  "rolePurchased": "{roleName} acheté !",
+  "@rolePurchased": {
+    "description": "Snackbar message shown after successfully buying a role",
+    "placeholders": {
+      "roleName": {
+        "type": "String",
+        "description": "The name of the purchased role"
+      }
+    }
+  },
+  "close": "Fermer",
+  "@close": {
+    "description": "Generic close button label"
+  },
+  "buy": "Acheter",
+  "@buy": {
+    "description": "Buy button label in the role purchase dialog"
+  },
+  "giveToNarratorTitle": "Prêt à Commencer",
+  "@giveToNarratorTitle": {
+    "description": "Title shown on the Give to Narrator page"
+  },
+  "giveToNarratorInstruction": "Passez le téléphone\nau Narrateur",
+  "@giveToNarratorInstruction": {
+    "description": "Main instruction asking players to hand the phone to the Narrator"
+  },
+  "giveToNarratorDescription": "Le Narrateur guidera la partie\npendant les phases nuit et jour",
+  "@giveToNarratorDescription": {
+    "description": "Supporting description of the Narrator's role"
+  },
+  "giveToNarratorStartButton": "DÉMARRER LA PARTIE",
+  "@giveToNarratorStartButton": {
+    "description": "Label for the start game button"
+  },
+  "addPlayers": "Ajouter des Joueurs",
+  "@addPlayers": {
+    "description": "Title on the names selection page"
+  },
+  "playersAdded": "{count, plural, one{{count} joueur ajouté} other{{count} joueurs ajoutés}}",
+  "@playersAdded": {
+    "description": "Subtitle showing how many players have been added",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "typeAName": "Tapez un nom…",
+  "@typeAName": {
+    "description": "Hint text in the name input field"
+  },
+  "duplicatePlayerError": "Ce nom de joueur existe déjà !",
+  "@duplicatePlayerError": {
+    "description": "Snackbar message when a duplicate name is entered"
+  },
+  "editName": "Modifier le Nom",
+  "@editName": {
+    "description": "Title of the edit name dialog"
+  },
+  "enterPlayerName": "Entrez le nom du joueur",
+  "@enterPlayerName": {
+    "description": "Hint text in the edit name dialog text field"
+  },
+  "save": "Sauvegarder",
+  "@save": {
+    "description": "Save button label in the edit name dialog"
+  },
+  "pickFromSavedPlayers": "Choisir parmi les joueurs sauvegardés",
+  "@pickFromSavedPlayers": {
+    "description": "Tooltip for the saved players button"
+  },
+  "minPlayersNeeded": "{count, plural, one{Minimum {count} joueur supplémentaire requis} other{Minimum {count} joueurs supplémentaires requis}}",
+  "@minPlayersNeeded": {
+    "description": "Notice shown when fewer than 5 players have been added",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlayersYet": "Aucun joueur ajouté",
+  "@noPlayersYet": {
+    "description": "Empty state heading in the player list"
+  },
+  "noPlayersHint": "Tapez un nom ou appuyez sur 👥 pour choisir",
+  "@noPlayersHint": {
+    "description": "Empty state hint below the heading"
+  },
+  "savedPlayers": "Joueurs Sauvegardés",
+  "@savedPlayers": {
+    "description": "Title of the saved players bottom sheet"
+  },
+  "addCount": "Ajouter {count}",
+  "@addCount": {
+    "description": "Button label showing how many selected players will be added",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allSavedAlreadyAdded": "Tous les joueurs sauvegardés sont déjà ajoutés\nou aucun historique.",
+  "@allSavedAlreadyAdded": {
+    "description": "Empty state text in the saved players sheet"
+  },
+  "selectAll": "Tout Sélectionner",
+  "@selectAll": {
+    "description": "Select-all button in the saved players sheet"
+  },
+  "addSelected": "Ajouter la Sélection",
+  "@addSelected": {
+    "description": "Add-selected button label when nothing is selected"
+  },
+  "continueWithPlayers": "CONTINUER AVEC {count} JOUEURS",
+  "@continueWithPlayers": {
+    "description": "Continue button label when enough players are added",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addAtLeast5Players": "AJOUTEZ AU MOINS 5 JOUEURS",
+  "@addAtLeast5Players": {
+    "description": "Continue button label when not enough players are added"
+  },
+  "exitGameDialogTitle": "Quitter la Partie ?",
+  "@exitGameDialogTitle": {
+    "description": "Title of the confirmation dialog when the user tries to exit the game"
+  },
+  "exitGameDialogContent": "Voulez-vous vraiment quitter ? Votre progression sera perdue.",
+  "@exitGameDialogContent": {
+    "description": "Body text of the exit game confirmation dialog"
+  },
+  "exitGameDialogCancel": "Annuler",
+  "@exitGameDialogCancel": {
+    "description": "Cancel button label in the exit game dialog"
+  },
+  "exitGameDialogConfirm": "Quitter",
+  "@exitGameDialogConfirm": {
+    "description": "Confirm exit button label in the exit game dialog"
+  },
+  "roleSelectionTitle": "Choisir les Rôles",
+  "@roleSelectionTitle": {
+    "description": "Title shown in the header of the role selection page"
+  },
+  "roleSelectionProgressSuffix": " / {total}",
+  "@roleSelectionProgressSuffix": {
+    "description": "Suffix shown next to the current role count",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "roleSelectionShopBanner": "PLUS DE RÔLES ? VISITEZ LA BOUTIQUE",
+  "@roleSelectionShopBanner": {
+    "description": "Banner text that links to the shop for more roles"
+  },
+  "roleSelectionStartGame": "DÉMARRER LA PARTIE",
+  "@roleSelectionStartGame": {
+    "description": "Label on the start game button when role selection is complete"
+  },
+  "roleSelectionSelectMore": "SÉLECTIONNEZ {count} {count, plural, one{RÔLE} other{RÔLES}} DE PLUS",
+  "@roleSelectionSelectMore": {
+    "description": "Label on the bottom button when more roles still need to be selected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roleAssignment": "Attribution des Rôles",
+  "@roleAssignment": {
+    "description": "Title on the picker page"
+  },
+  "playerXofY": "Joueur {current} sur {total}",
+  "@playerXofY": {
+    "description": "Current player index out of total",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToReveal": "Appuyez pour révéler",
+  "@tapToReveal": {
+    "description": "Prompt on the back of the role card"
+  },
+  "abilityLabel": "CAPACITÉ",
+  "@abilityLabel": {
+    "description": "Section label above the ability description on the card"
+  },
+  "nextPlayer": "JOUEUR SUIVANT",
+  "@nextPlayer": {
+    "description": "Button to advance to the next player"
+  },
+  "done": "TERMINÉ",
+  "@done": {
+    "description": "Button label on the last player's turn"
+  },
+  "skipToGame": "Passer au jeu",
+  "@skipToGame": {
+    "description": "Debug-mode skip button"
+  },
+  "settingsLanguage": "Langue",
+  "@settingsLanguage": {
+    "description": "Titre de la section des paramètres de langue"
+  },
+  "settingsLanguageLabel": "Langue de l'application",
+  "@settingsLanguageLabel": {
+    "description": "Libellé de la ligne du sélecteur de langue"
+  },
+  "settingsLanguageDesc": "Choisissez votre langue préférée",
+  "@settingsLanguageDesc": {
+    "description": "Description sous le libellé du sélecteur de langue"
+  },
+  "settingsDangerZone": "Zone Dangereuse",
+  "@settingsDangerZone": {
+    "description": "Titre de la section pour les actions destructives"
+  },
+  "settingsWipeData": "Effacer les données",
+  "@settingsWipeData": {
+    "description": "Libellé de la ligne d'effacement des données"
+  },
+  "settingsWipeDataDesc": "Supprimer définitivement toutes les données et la progression du jeu",
+  "@settingsWipeDataDesc": {
+    "description": "Description sous le libellé d'effacement des données"
+  },
+  "settingsWipeConfirmTitle": "Êtes-vous sûr ?",
+  "@settingsWipeConfirmTitle": {
+    "description": "Titre de la boîte de confirmation d'effacement"
+  },
+  "settingsWipeConfirmMessage": "Cela effacera définitivement toutes vos données de jeu, scores et progression. Cette action est irréversible.",
+  "@settingsWipeConfirmMessage": {
+    "description": "Corps de la boîte de confirmation d'effacement"
+  },
+  "settingsWipeConfirm": "Oui, effacer",
+  "@settingsWipeConfirm": {
+    "description": "Bouton de confirmation dans la boîte de dialogue d'effacement"
+  }
+}

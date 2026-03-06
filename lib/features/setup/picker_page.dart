@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/setup/providers/names_provider.dart';
 import 'package:loup_garou/features/setup/providers/roles_provider.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/models/game_character.dart';
 
 class PickerPage extends ConsumerStatefulWidget {
@@ -21,6 +22,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final names = ref.watch(namesProvider);
 
     return Scaffold(
@@ -74,9 +76,9 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Role Assignment',
-                                style: TextStyle(
+                              Text(
+                                l10n.roleAssignment,
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFd4af37),
@@ -84,7 +86,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Player ${currentIndex + 1} of ${names.length}',
+                                l10n.playerXofY(currentIndex + 1, names.length),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.white.withValues(alpha: 0.6),
@@ -203,7 +205,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                           },
                         )
                       else
-                        SizedBox(height: 64),
+                        const SizedBox(height: 64),
 
                       const SizedBox(height: 16),
 
@@ -213,7 +215,7 @@ class _PickerPageState extends ConsumerState<PickerPage> {
                             context.pushReplacement("/give-narrator");
                           },
                           child: Text(
-                            "Skip to game",
+                            l10n.skipToGame,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.5),
                             ),
@@ -246,6 +248,8 @@ class _NextButtonState extends State<_NextButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -277,7 +281,7 @@ class _NextButtonState extends State<_NextButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                widget.isLastPlayer ? 'DONE' : 'NEXT PLAYER',
+                widget.isLastPlayer ? l10n.done : l10n.nextPlayer,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -371,15 +375,17 @@ class _AnimatedCardFlipState extends State<AnimatedCardFlip>
               ? Transform(
                   alignment: Alignment.center,
                   transform: Matrix4.identity()..rotateY(pi),
-                  child: _buildFrontCard(),
+                  child: _buildFrontCard(context),
                 )
-              : _buildBackCard(),
+              : _buildBackCard(context),
         );
       },
     );
   }
 
-  Widget _buildBackCard() {
+  Widget _buildBackCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: 340,
       height: 460,
@@ -427,7 +433,7 @@ class _AnimatedCardFlipState extends State<AnimatedCardFlip>
                 ),
               ],
             ),
-            child: Icon(Icons.person, size: 48, color: const Color(0xFF0a0e27)),
+            child: const Icon(Icons.person, size: 48, color: Color(0xFF0a0e27)),
           ),
           const SizedBox(height: 24),
           Text(
@@ -459,7 +465,7 @@ class _AnimatedCardFlipState extends State<AnimatedCardFlip>
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Tap to reveal',
+                  l10n.tapToReveal,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -474,7 +480,9 @@ class _AnimatedCardFlipState extends State<AnimatedCardFlip>
     );
   }
 
-  Widget _buildFrontCard() {
+  Widget _buildFrontCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: 340,
       height: 460,
@@ -548,8 +556,8 @@ class _AnimatedCardFlipState extends State<AnimatedCardFlip>
               Container(
                 width: 80,
                 height: 2,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
                       Color(0xFFd4af37),
@@ -574,7 +582,7 @@ class _AnimatedCardFlipState extends State<AnimatedCardFlip>
                 child: Column(
                   children: [
                     Text(
-                      'ABILITY',
+                      l10n.abilityLabel,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

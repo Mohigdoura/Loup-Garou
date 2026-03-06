@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/models/game_state.dart';
 import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/Game/widgets/game_over_dialog.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/models/game_character.dart';
 import 'package:loup_garou/models/game_characters.dart';
 
@@ -34,6 +35,7 @@ class _DayPageState extends ConsumerState<DayPage>
   }
 
   Future<GamePlayer?> _pickPlayer(List<GamePlayer> candidates) async {
+    final l10n = AppLocalizations.of(context)!;
     return await showDialog<GamePlayer>(
       context: context,
       barrierDismissible: false,
@@ -66,10 +68,10 @@ class _DayPageState extends ConsumerState<DayPage>
                       size: 28,
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Vote: Choose who to eliminate',
-                        style: TextStyle(
+                        l10n.voteDialogTitle,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.orange,
@@ -86,7 +88,6 @@ class _DayPageState extends ConsumerState<DayPage>
                   itemCount: candidates.length + 1,
                   itemBuilder: (context, index) {
                     if (index == candidates.length) {
-                      // Skip option
                       return InkWell(
                         onTap: () => context.pop(null),
                         child: Container(
@@ -112,7 +113,7 @@ class _DayPageState extends ConsumerState<DayPage>
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Skip / Tie - No elimination',
+                                l10n.voteSkipTie,
                                 style: TextStyle(
                                   color: Colors.orange.shade300,
                                   fontSize: 16,
@@ -196,6 +197,7 @@ class _DayPageState extends ConsumerState<DayPage>
   }
 
   Future<void> _vote() async {
+    final l10n = AppLocalizations.of(context)!;
     final gameState = ref.watch(gameStateProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
 
@@ -206,14 +208,13 @@ class _DayPageState extends ConsumerState<DayPage>
     if (eliminated != null && mounted) {
       gameStateNotifier.votePlayer(eliminated);
 
-      // Reveal result
       final result = eliminated.gameCharacter.team == Team.wolves
-          ? 'is a wolf'
+          ? l10n.voteResultIsWolf
           : eliminated.gameCharacter is LittlePrince
-          ? "is the little prince"
+          ? l10n.voteResultIsLittlePrince
           : eliminated.gameCharacter is SerialKiller
-          ? "is the serial killer"
-          : 'is not a wolf';
+          ? l10n.voteResultIsSerialKiller
+          : l10n.voteResultNotWolf;
 
       await showDialog(
         context: context,
@@ -250,9 +251,9 @@ class _DayPageState extends ConsumerState<DayPage>
                       : Colors.blue.shade600,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Vote Result',
-                  style: TextStyle(
+                Text(
+                  l10n.voteResultTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -260,11 +261,15 @@ class _DayPageState extends ConsumerState<DayPage>
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${eliminated.name} $result',
+                  l10n.voteResultMessage(eliminated.name, result),
                   style: TextStyle(
                     fontSize: 18,
-                    color: eliminated.gameCharacter.team == Team.wolves
+                    color:
+                        eliminated.gameCharacter.team == Team.wolves ||
+                            eliminated.gameCharacter is SerialKiller
                         ? Colors.red.shade400
+                        : eliminated.gameCharacter is LittlePrince
+                        ? Colors.green.shade400
                         : Colors.blue.shade400,
                   ),
                   textAlign: TextAlign.center,
@@ -282,7 +287,7 @@ class _DayPageState extends ConsumerState<DayPage>
                       vertical: 12,
                     ),
                   ),
-                  child: const Text('OK'),
+                  child: Text(l10n.ok),
                 ),
               ],
             ),
@@ -290,20 +295,19 @@ class _DayPageState extends ConsumerState<DayPage>
         ),
       );
 
-      // Check win condition
       if (gameStateNotifier.checkWinCondition() && mounted) {
         await GameOverDialog.show(context, ref);
         return;
       }
     }
 
-    // Go to next night (whether someone was eliminated or not)
     if (!mounted) return;
     gameStateNotifier.nextNight();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final gameState = ref.watch(gameStateProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     List<GamePlayer> talkingOrder = gameState.talkingOrder;
@@ -314,11 +318,7 @@ class _DayPageState extends ConsumerState<DayPage>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF87CEEB), // Sky blue
-              Color(0xFFffd89b), // Warm yellow
-              Color(0xFFffa751), // Orange
-            ],
+            colors: [Color(0xFF87CEEB), Color(0xFFffd89b), Color(0xFFffa751)],
           ),
         ),
         child: Column(
@@ -369,7 +369,7 @@ class _DayPageState extends ConsumerState<DayPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Day ${gameState.nightCount}',
+                        l10n.dayTitle(gameState.nightCount),
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -384,7 +384,7 @@ class _DayPageState extends ConsumerState<DayPage>
                         ),
                       ),
                       Text(
-                        'Time to deliberate',
+                        l10n.daySubtitle,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white.withValues(alpha: 0.9),
@@ -415,11 +415,11 @@ class _DayPageState extends ConsumerState<DayPage>
                   children: [
                     Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
                           colors: [Color(0xFFffa751), Color(0xFFffd89b)],
                         ),
-                        borderRadius: const BorderRadius.only(
+                        borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20),
                         ),
@@ -431,9 +431,9 @@ class _DayPageState extends ConsumerState<DayPage>
                             color: Colors.white,
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            'Talking Order',
-                            style: TextStyle(
+                          Text(
+                            l10n.talkingOrder,
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -525,12 +525,15 @@ class _DayPageState extends ConsumerState<DayPage>
                                 ),
                               ),
                               subtitle: Text(
-                                p.gameCharacter.name +
-                                    (p.isDead
-                                        ? ' • DEAD'
-                                        : isSilenced
-                                        ? ' • SILENCED'
-                                        : ''),
+                                p.isDead
+                                    ? l10n.playerStatusDead(
+                                        p.gameCharacter.name,
+                                      )
+                                    : isSilenced
+                                    ? l10n.playerStatusSilenced(
+                                        p.gameCharacter.name,
+                                      )
+                                    : p.gameCharacter.name,
                                 style: TextStyle(
                                   color: isAlive
                                       ? (isSilenced
@@ -554,7 +557,7 @@ class _DayPageState extends ConsumerState<DayPage>
                                     IconButton(
                                       icon: const Icon(Icons.auto_fix_high),
                                       color: Colors.orange.shade700,
-                                      tooltip: 'Day Ability',
+                                      tooltip: l10n.dayAbilityTooltip,
                                       onPressed: () async {
                                         await gameStateNotifier.dayAbility(p);
                                       },
@@ -597,14 +600,14 @@ class _DayPageState extends ConsumerState<DayPage>
                           ),
                         ],
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.how_to_vote, color: Colors.white),
-                          SizedBox(width: 8),
+                          const Icon(Icons.how_to_vote, color: Colors.white),
+                          const SizedBox(width: 8),
                           Text(
-                            'VOTE TO ELIMINATE',
-                            style: TextStyle(
+                            l10n.voteToEliminate,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.5,
@@ -626,9 +629,9 @@ class _DayPageState extends ConsumerState<DayPage>
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'SKIP VOTE',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.skipVote,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,

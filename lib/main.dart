@@ -12,10 +12,13 @@ import 'package:loup_garou/features/Game/give_to_narrator_page.dart';
 import 'package:loup_garou/features/Game/night/night_page.dart';
 import 'package:loup_garou/features/landing/main_menu.dart';
 import 'package:loup_garou/features/landing/patch_loading_page.dart';
+import 'package:loup_garou/features/settings/settings_page.dart';
 import 'package:loup_garou/features/setup/names_selection_page.dart';
 import 'package:loup_garou/features/setup/picker_page.dart'; // Ensure correct path
 import 'package:loup_garou/features/setup/role_selection_page.dart'; // Ensure correct path
 import 'package:loup_garou/features/shop/shop_page.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
+import 'package:loup_garou/language/language_provider.dart';
 import 'package:loup_garou/providers/shared_prefs_provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -96,6 +99,11 @@ final _router = GoRouter(
       pageBuilder: (context, state) =>
           buildSlideTransition(key: state.pageKey, child: const PickerPage()),
     ),
+    GoRoute(
+      path: '/settings',
+      pageBuilder: (context, state) =>
+          buildSlideTransition(key: state.pageKey, child: const SettingsPage()),
+    ),
   ],
 );
 
@@ -116,11 +124,12 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(languageProvider);
     return MaterialApp.router(
       routerConfig: _router,
       title: 'Loup Garou',
@@ -135,6 +144,9 @@ class MyApp extends StatelessWidget {
       ),
       // 👇 Add this builder to wrap every screen with the patch checker
       builder: (context, child) => PatchWrapper(child: child!),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: Locale(locale.code),
     );
   }
 }

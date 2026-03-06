@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:loup_garou/features/Game/providers/game_state_provider.dart';
 import 'package:loup_garou/features/setup/widgets/role_card.dart';
 import 'package:loup_garou/features/shop/providers/shop_provider.dart';
+import 'package:loup_garou/l10n/app_localizations.dart';
 import 'package:loup_garou/providers/ad_provider.dart';
 import 'package:loup_garou/features/setup/providers/names_provider.dart';
 import 'package:loup_garou/features/setup/providers/roles_provider.dart';
@@ -75,7 +76,9 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(shopProvider); // <-- add this line
+    final l10n = AppLocalizations.of(context)!;
+
+    ref.watch(shopProvider);
     final availableRoles = ref
         .read(rolesProvider.notifier)
         .getAllAvailableRoles();
@@ -107,9 +110,9 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                         onPressed: () => Navigator.pop(context),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
-                        'Select Roles',
-                        style: TextStyle(
+                      Text(
+                        l10n.roleSelectionTitle,
+                        style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFd4af37),
@@ -135,7 +138,9 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                                   ),
                                 ),
                                 Text(
-                                  ' / ${selection.targetTotal}',
+                                  l10n.roleSelectionProgressSuffix(
+                                    selection.targetTotal,
+                                  ),
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.white.withValues(alpha: 0.6),
@@ -143,7 +148,6 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 10),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
@@ -230,7 +234,6 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                     itemCount: availableRoles.length,
                     itemBuilder: (context, index) {
                       final role = availableRoles[index];
-
                       return RoleCard(
                         role: role,
                         count: selection.getCount(role),
@@ -244,7 +247,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                     },
                   ),
                 ),
-                // Add this just before the bottom button Container
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: GestureDetector(
@@ -277,7 +280,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'WANT MORE ROLES? VISIT THE SHOP',
+                            l10n.roleSelectionShopBanner,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -300,9 +303,8 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 8,
-                ), // spacing before the START GAME button
+                const SizedBox(height: 8),
+
                 // Bottom button
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -355,8 +357,10 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage>
                           children: [
                             Text(
                               selection.isComplete
-                                  ? 'START GAME'
-                                  : 'SELECT ${selection.remainingSlots} MORE ${selection.remainingSlots == 1 ? "ROLE" : "ROLES"}',
+                                  ? l10n.roleSelectionStartGame
+                                  : l10n.roleSelectionSelectMore(
+                                      selection.remainingSlots,
+                                    ),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
