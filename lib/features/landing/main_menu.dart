@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loup_garou/providers/ad_provider.dart';
 
 class MainMenu extends ConsumerStatefulWidget {
   const MainMenu({super.key});
@@ -10,6 +11,13 @@ class MainMenu extends ConsumerStatefulWidget {
 }
 
 class _MainMenuState extends ConsumerState<MainMenu> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(adProvider.notifier).loadInterstitial();
+    ref.read(adProvider.notifier).loadRewarded();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -255,9 +263,9 @@ class _MenuButtonState extends State<_MenuButton> {
         widget.onPressed();
       },
       onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
+      child: AnimatedScale(
+        scale: _isPressed ? 0.95 : 1.0,
         duration: const Duration(milliseconds: 150),
-        transform: Matrix4.identity()..scale(_isPressed ? 0.95 : 1.0),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(

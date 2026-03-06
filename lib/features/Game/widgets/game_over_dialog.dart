@@ -19,7 +19,7 @@ class GameOverDialog {
           style: TextStyle(color: Color(0xFFd4af37)),
         ),
         content: Text(
-          gameState.winCondition?.message ?? 'Game ended.',
+          "${gameState.winCondition!.winners!.length > 1 ? 'The winners are : ' : 'The winner is : '} ${gameState.winCondition!.winners!.map((e) => e.name).join(', ')}",
           style: const TextStyle(color: Colors.white),
         ),
         actions: [

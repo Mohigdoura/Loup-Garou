@@ -97,7 +97,6 @@ class AdNotifier extends Notifier<AdState> {
         ad.dispose();
         loadInterstitial(); // Preload next ad
         onDismissed();
-        print('Interstitial ad failed to show: ${err.message}');
       },
     );
 
@@ -139,8 +138,6 @@ class AdNotifier extends Notifier<AdState> {
     ad.show(
       onUserEarnedReward: (ad, reward) {
         onRewardEarned(reward.amount.toInt());
-
-        print('User earned reward: ${reward.amount} ${reward.type}');
       },
     );
   }

@@ -55,6 +55,12 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("com.google.android.play:integrity:1.3.0")
 
+     // Unity Ads Adapter for AdMob mediation
+    implementation("com.google.ads.mediation:unity:4.12.2.0")
+    
+    // Liftoff (Vungle) Adapter for AdMob mediation
+    implementation("com.google.ads.mediation:vungle:7.4.2.0")
+
 }
 flutter {
     source = "../.."

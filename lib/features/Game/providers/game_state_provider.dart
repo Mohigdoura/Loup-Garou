@@ -318,7 +318,12 @@ class GameStateNotifier extends Notifier<GameState> {
     if (state.winCondition != null) {
       return true;
     }
-
+    final wolves = state.players
+        .where((element) => element.gameCharacter.team == Team.wolves)
+        .toList();
+    final villagers = state.players
+        .where((element) => element.gameCharacter.team == Team.village)
+        .toList();
     final alivePlayers = state.alivePlayers;
     final aliveVillagers = state.aliveVillagers;
     final aliveWolves = state.aliveWolves;
@@ -332,8 +337,8 @@ class GameStateNotifier extends Notifier<GameState> {
         aliveVillagers.isNotEmpty) {
       state = state.copyWith(
         winCondition: WinCondition(
-          message: 'Village wins! All wolves are dead.',
           winningTeam: Team.village,
+          winners: villagers,
         ),
       );
       return true;
@@ -344,10 +349,7 @@ class GameStateNotifier extends Notifier<GameState> {
         aliveWolves.isNotEmpty &&
         aliveKillers.isEmpty) {
       state = state.copyWith(
-        winCondition: WinCondition(
-          message: 'Wolves win! They killed all the villagers.',
-          winningTeam: Team.wolves,
-        ),
+        winCondition: WinCondition(winningTeam: Team.wolves, winners: wolves),
       );
       return true;
     }
@@ -356,8 +358,6 @@ class GameStateNotifier extends Notifier<GameState> {
     if (alivePlayers.length == 1) {
       state = state.copyWith(
         winCondition: WinCondition(
-          message:
-              '${alivePlayers.first.name} (${alivePlayers.first.gameCharacter.name}) wins! They are the last player alive.',
           winningTeam: alivePlayers.first.gameCharacter.team,
           winners: [alivePlayers.first],
         ),

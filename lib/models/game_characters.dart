@@ -930,11 +930,7 @@ class Clown extends GameCharacter {
     required GamePlayer self,
   }) async {
     actions.setWinCondition(
-      WinCondition(
-        message: '${self.name} (Clown) wins! They were voted out.',
-        winningTeam: Team.solo,
-        winners: [self],
-      ),
+      WinCondition(winningTeam: Team.solo, winners: [self]),
     );
   }
 }

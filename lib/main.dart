@@ -105,12 +105,7 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   await dotenv.load(fileName: '.env');
   if (!kDebugMode) {
-    try {
-      MobileAds.instance.initialize();
-      log('initialized Google Mobile Ads successfully');
-    } on Exception catch (e) {
-      log('Failed to initialize Google Mobile Ads: $e');
-    }
+    MobileAds.instance.initialize();
   }
 
   runApp(
